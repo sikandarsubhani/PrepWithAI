@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Clock,
   Trophy,
@@ -13,8 +13,8 @@ import {
   Mic,
   Video,
   MessageSquare,
-} from "lucide-react";
-import { formatDuration, getScoreColor } from "@/lib/utils";
+} from 'lucide-react';
+import { formatDuration, getScoreColor } from '@/lib/utils';
 
 interface Session {
   _id: string;
@@ -33,18 +33,18 @@ export default function HistoryPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "text" | "voice" | "video">(
-    "all",
+  const [filter, setFilter] = useState<'all' | 'text' | 'voice' | 'video'>(
+    'all'
   );
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/sessions");
+        const res = await fetch('/api/sessions');
         const data = await res.json();
         setSessions(data.sessions || []);
       } catch {
-        console.error("Failed to load sessions");
+        console.error('Failed to load sessions');
       } finally {
         setLoading(false);
       }
@@ -53,46 +53,46 @@ export default function HistoryPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (filter === "all") return sessions;
-    return sessions.filter((s) => {
-      if (filter === "voice") return s.voiceMode && s.mode !== "video";
-      if (filter === "video") return s.mode === "video";
-      return !s.voiceMode && s.mode !== "video";
+    if (filter === 'all') return sessions;
+    return sessions.filter(s => {
+      if (filter === 'voice') return s.voiceMode && s.mode !== 'video';
+      if (filter === 'video') return s.mode === 'video';
+      return !s.voiceMode && s.mode !== 'video';
     });
   }, [sessions, filter]);
 
   const stats = useMemo(() => {
     const total = sessions.length;
-    const scored = sessions.filter((s) => s.score != null);
+    const scored = sessions.filter(s => s.score != null);
     const avgScore =
       scored.length > 0
         ? scored.reduce((sum, s) => sum + (s.score || 0), 0) / scored.length
         : 0;
     const totalTime = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
     const best =
-      scored.length > 0 ? Math.max(...scored.map((s) => s.score || 0)) : 0;
+      scored.length > 0 ? Math.max(...scored.map(s => s.score || 0)) : 0;
     return { total, avgScore: Math.round(avgScore), totalTime, best };
   }, [sessions]);
 
   const getModeIcon = (s: Session) => {
-    if (s.mode === "video") return <Video style={{ width: 14, height: 14 }} />;
+    if (s.mode === 'video') return <Video style={{ width: 14, height: 14 }} />;
     if (s.voiceMode) return <Mic style={{ width: 14, height: 14 }} />;
     return <MessageSquare style={{ width: 14, height: 14 }} />;
   };
 
   const getModeLabel = (s: Session) => {
-    if (s.mode === "video") return "Video";
-    if (s.voiceMode) return "Voice";
-    return "Text";
+    if (s.mode === 'video') return 'Video';
+    if (s.voiceMode) return 'Voice';
+    return 'Text';
   };
 
   if (loading) {
     return (
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           minHeight: 400,
         }}
       >
@@ -100,8 +100,8 @@ export default function HistoryPage() {
           style={{
             width: 32,
             height: 32,
-            animation: "spin 1s linear infinite",
-            color: "#6366F1",
+            animation: 'spin 1s linear infinite',
+            color: '#6366F1',
           }}
         />
       </div>
@@ -110,15 +110,15 @@ export default function HistoryPage() {
 
   return (
     <div
-      className="animate-fade-up"
-      style={{ maxWidth: 1000, margin: "0 auto" }}
+      className='animate-fade-up'
+      style={{ maxWidth: 1000, margin: '0 auto' }}
     >
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <h1 className="text-display" style={{ marginBottom: 8 }}>
+        <h1 className='text-display' style={{ marginBottom: 8 }}>
           Session History
         </h1>
-        <p className="text-body" style={{ color: "var(--text-secondary)" }}>
+        <p className='text-body' style={{ color: 'var(--text-secondary)' }}>
           Review your past interview sessions and track improvement
         </p>
       </div>
@@ -126,52 +126,52 @@ export default function HistoryPage() {
       {/* Stats Row */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 12,
           marginBottom: 32,
         }}
       >
         {[
           {
-            label: "Total Sessions",
+            label: 'Total Sessions',
             value: stats.total,
             icon: Calendar,
-            color: "#6366F1",
+            color: '#6366F1',
           },
           {
-            label: "Avg Score",
+            label: 'Avg Score',
             value: `${stats.avgScore}%`,
             icon: TrendingUp,
-            color: "#22C55E",
+            color: '#22C55E',
           },
           {
-            label: "Best Score",
+            label: 'Best Score',
             value: `${stats.best}%`,
             icon: Trophy,
-            color: "#F59E0B",
+            color: '#F59E0B',
           },
           {
-            label: "Total Time",
+            label: 'Total Time',
             value: formatDuration(stats.totalTime),
             icon: Clock,
-            color: "#3B82F6",
+            color: '#3B82F6',
           },
         ].map((stat, i) => (
           <div
             key={i}
             className={`stagger-${i + 1}`}
             style={{
-              padding: "16px 20px",
+              padding: '16px 20px',
               borderRadius: 14,
-              backgroundColor: "var(--bg-surface)",
-              border: "1px solid var(--border-default)",
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
             }}
           >
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 8,
                 marginBottom: 8,
               }}
@@ -182,9 +182,9 @@ export default function HistoryPage() {
                   height: 28,
                   borderRadius: 8,
                   backgroundColor: `${stat.color}15`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <stat.icon
@@ -192,8 +192,8 @@ export default function HistoryPage() {
                 />
               </div>
               <span
-                className="text-caption"
-                style={{ color: "var(--text-muted)" }}
+                className='text-caption'
+                style={{ color: 'var(--text-muted)' }}
               >
                 {stat.label}
               </span>
@@ -202,7 +202,7 @@ export default function HistoryPage() {
               style={{
                 fontSize: 24,
                 fontWeight: 700,
-                color: "var(--text-primary)",
+                color: 'var(--text-primary)',
               }}
             >
               {stat.value}
@@ -214,39 +214,39 @@ export default function HistoryPage() {
       {/* Mode Filter */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 8,
           marginBottom: 20,
         }}
       >
-        <Filter style={{ width: 14, height: 14, color: "var(--text-muted)" }} />
-        {(["all", "text", "voice", "video"] as const).map((f) => (
+        <Filter style={{ width: 14, height: 14, color: 'var(--text-muted)' }} />
+        {(['all', 'text', 'voice', 'video'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             style={{
-              padding: "5px 14px",
+              padding: '5px 14px',
               borderRadius: 8,
               fontSize: 12,
               fontWeight: 500,
               backgroundColor:
                 filter === f
-                  ? "rgba(99,102,241,0.15)"
-                  : "rgba(255,255,255,0.04)",
-              border: `1px solid ${filter === f ? "rgba(99,102,241,0.3)" : "var(--border-subtle)"}`,
-              color: filter === f ? "#818CF8" : "var(--text-secondary)",
-              cursor: "pointer",
-              textTransform: "capitalize",
+                  ? 'rgba(99,102,241,0.15)'
+                  : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${filter === f ? 'rgba(99,102,241,0.3)' : 'var(--border-subtle)'}`,
+              color: filter === f ? '#818CF8' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              textTransform: 'capitalize',
             }}
           >
-            {f === "all" ? `All (${sessions.length})` : f}
+            {f === 'all' ? `All (${sessions.length})` : f}
           </button>
         ))}
       </div>
 
       {/* Session List */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {filtered.map((session, i) => {
           const score = session.score ?? 0;
           const scoreColor = getScoreColor(score);
@@ -259,23 +259,23 @@ export default function HistoryPage() {
               onClick={() => router.push(`/interview/${session._id}/report`)}
               className={`stagger-${Math.min(i + 1, 8)}`}
               style={{
-                padding: "14px 20px",
+                padding: '14px 20px',
                 borderRadius: 14,
-                backgroundColor: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
                 gap: 16,
-                transition: "all 200ms ease",
+                transition: 'all 200ms ease',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-elevated)";
-                e.currentTarget.style.borderColor = "var(--border-hover)";
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                e.currentTarget.style.borderColor = 'var(--border-hover)';
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-surface)";
-                e.currentTarget.style.borderColor = "var(--border-default)";
+              onMouseLeave={e => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+                e.currentTarget.style.borderColor = 'var(--border-default)';
               }}
             >
               {/* Score circle */}
@@ -283,19 +283,19 @@ export default function HistoryPage() {
                 style={{
                   width: 44,
                   height: 44,
-                  borderRadius: "50%",
+                  borderRadius: '50%',
                   border: `2px solid ${scoreColor}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
                 <span
-                  className="font-code"
+                  className='font-code'
                   style={{ fontSize: 13, fontWeight: 700, color: scoreColor }}
                 >
-                  {score > 0 ? score : "—"}
+                  {score > 0 ? score : '—'}
                 </span>
               </div>
 
@@ -303,8 +303,8 @@ export default function HistoryPage() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 8,
                     marginBottom: 4,
                   }}
@@ -313,22 +313,22 @@ export default function HistoryPage() {
                     style={{
                       fontSize: 14,
                       fontWeight: 600,
-                      color: "var(--text-primary)",
-                      textTransform: "capitalize",
+                      color: 'var(--text-primary)',
+                      textTransform: 'capitalize',
                     }}
                   >
-                    {session.type.replace(/_/g, " ")}
+                    {session.type.replace(/_/g, ' ')}
                   </span>
                   <span
                     style={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 3,
                       fontSize: 11,
-                      padding: "1px 6px",
+                      padding: '1px 6px',
                       borderRadius: 4,
-                      backgroundColor: "rgba(255,255,255,0.05)",
-                      color: "var(--text-muted)",
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      color: 'var(--text-muted)',
                     }}
                   >
                     {getModeIcon(session)} {getModeLabel(session)}
@@ -336,18 +336,18 @@ export default function HistoryPage() {
                 </div>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: 12,
                     fontSize: 12,
-                    color: "var(--text-muted)",
+                    color: 'var(--text-muted)',
                   }}
                 >
-                  <span style={{ textTransform: "capitalize" }}>
+                  <span style={{ textTransform: 'capitalize' }}>
                     {session.company}
                   </span>
                   <span>·</span>
-                  <span style={{ textTransform: "capitalize" }}>
+                  <span style={{ textTransform: 'capitalize' }}>
                     {session.difficulty}
                   </span>
                   {session.duration && (
@@ -363,7 +363,7 @@ export default function HistoryPage() {
               <span
                 style={{
                   fontSize: 12,
-                  color: "var(--text-disabled)",
+                  color: 'var(--text-disabled)',
                   flexShrink: 0,
                 }}
               >
@@ -374,7 +374,7 @@ export default function HistoryPage() {
                 style={{
                   width: 16,
                   height: 16,
-                  color: "var(--text-disabled)",
+                  color: 'var(--text-disabled)',
                   flexShrink: 0,
                 }}
               />
@@ -383,19 +383,19 @@ export default function HistoryPage() {
         })}
 
         {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "48px 0" }}>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
             <Clock
               style={{
                 width: 32,
                 height: 32,
-                color: "var(--text-disabled)",
-                margin: "0 auto 12px",
+                color: 'var(--text-disabled)',
+                margin: '0 auto 12px',
               }}
             />
             <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>
               No sessions yet
             </div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               Start an interview to see your history here
             </div>
           </div>
@@ -414,5 +414,5 @@ function getTimeAgo(date: Date): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }

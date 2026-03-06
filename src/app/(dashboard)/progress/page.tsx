@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   Trophy,
@@ -10,7 +10,7 @@ import {
   Clock,
   Loader2,
   Zap,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   RadarChart,
   PolarGrid,
@@ -23,8 +23,8 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { formatDuration, getScoreColor, getEloLevel } from "@/lib/utils";
+} from 'recharts';
+import { formatDuration, getScoreColor, getEloLevel } from '@/lib/utils';
 interface ProgressData {
   totalSessions: number;
   averageScore: number;
@@ -47,11 +47,11 @@ export default function ProgressPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/progress");
+        const res = await fetch('/api/progress');
         const data = await res.json();
         setProgress(data);
       } catch {
-        console.error("Failed to load progress");
+        console.error('Failed to load progress');
       } finally {
         setLoading(false);
       }
@@ -60,24 +60,24 @@ export default function ProgressPage() {
   }, []);
 
   const eloInfo = useMemo(() => {
-    if (!progress) return { name: "Beginner", color: "#6b7280", emoji: "🌱" };
+    if (!progress) return { name: 'Beginner', color: '#6b7280', emoji: '🌱' };
     const info = getEloLevel(progress.eloRating);
     const emojiMap: Record<string, string> = {
-      Beginner: "🌱",
-      Apprentice: "🌿",
-      Intermediate: "⚡",
-      Advanced: "🔥",
-      Expert: "💎",
-      Master: "👑",
-      Grandmaster: "🏆",
+      Beginner: '🌱',
+      Apprentice: '🌿',
+      Intermediate: '⚡',
+      Advanced: '🔥',
+      Expert: '💎',
+      Master: '👑',
+      Grandmaster: '🏆',
     };
-    return { ...info, emoji: emojiMap[info.name] || "🌱" };
+    return { ...info, emoji: emojiMap[info.name] || '🌱' };
   }, [progress]);
 
   const radarData = useMemo(() => {
     if (!progress?.skillBreakdown) return [];
-    return progress.skillBreakdown.map((s) => ({
-      skill: s.skill.replace(/_/g, " "),
+    return progress.skillBreakdown.map(s => ({
+      skill: s.skill.replace(/_/g, ' '),
       value: s.score,
       fullMark: 100,
     }));
@@ -85,10 +85,10 @@ export default function ProgressPage() {
 
   const chartData = useMemo(() => {
     if (!progress?.scoreHistory) return [];
-    return progress.scoreHistory.slice(-30).map((d) => ({
-      date: new Date(d.date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
+    return progress.scoreHistory.slice(-30).map(d => ({
+      date: new Date(d.date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
       }),
       score: d.score,
     }));
@@ -99,8 +99,8 @@ export default function ProgressPage() {
     const weeks: { date: Date; count: number }[][] = [];
     const today = new Date();
     const actMap = new Map<string, number>();
-    progress?.activityHeatmap?.forEach((a) =>
-      actMap.set(a.date.split("T")[0], a.count),
+    progress?.activityHeatmap?.forEach(a =>
+      actMap.set(a.date.split('T')[0], a.count)
     );
 
     for (let w = 11; w >= 0; w--) {
@@ -108,7 +108,7 @@ export default function ProgressPage() {
       for (let d = 0; d < 7; d++) {
         const date = new Date(today);
         date.setDate(date.getDate() - (w * 7 + (6 - d)));
-        const key = date.toISOString().split("T")[0];
+        const key = date.toISOString().split('T')[0];
         week.push({ date, count: actMap.get(key) || 0 });
       }
       weeks.push(week);
@@ -120,9 +120,9 @@ export default function ProgressPage() {
     return (
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           minHeight: 400,
         }}
       >
@@ -130,8 +130,8 @@ export default function ProgressPage() {
           style={{
             width: 32,
             height: 32,
-            animation: "spin 1s linear infinite",
-            color: "#6366F1",
+            animation: 'spin 1s linear infinite',
+            color: '#6366F1',
           }}
         />
       </div>
@@ -144,21 +144,21 @@ export default function ProgressPage() {
     progress.weeklyGoal > 0
       ? Math.min(
           100,
-          Math.round((progress.weeklyCompleted / progress.weeklyGoal) * 100),
+          Math.round((progress.weeklyCompleted / progress.weeklyGoal) * 100)
         )
       : 0;
 
   return (
     <div
-      className="animate-fade-up"
-      style={{ maxWidth: 1100, margin: "0 auto" }}
+      className='animate-fade-up'
+      style={{ maxWidth: 1100, margin: '0 auto' }}
     >
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <h1 className="text-display" style={{ marginBottom: 8 }}>
+        <h1 className='text-display' style={{ marginBottom: 8 }}>
           Your Progress
         </h1>
-        <p className="text-body" style={{ color: "var(--text-secondary)" }}>
+        <p className='text-body' style={{ color: 'var(--text-secondary)' }}>
           Track your growth and identify areas for improvement
         </p>
       </div>
@@ -166,65 +166,65 @@ export default function ProgressPage() {
       {/* Top Stats */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: 12,
           marginBottom: 32,
         }}
       >
         {[
           {
-            label: "ELO Rating",
+            label: 'ELO Rating',
             value: progress.eloRating,
             sub: `${eloInfo.emoji} ${eloInfo.name}`,
             icon: Zap,
-            color: "#6366F1",
+            color: '#6366F1',
           },
           {
-            label: "Average Score",
+            label: 'Average Score',
             value: `${progress.averageScore}%`,
             icon: Target,
-            color: "#22C55E",
+            color: '#22C55E',
           },
           {
-            label: "Total Sessions",
+            label: 'Total Sessions',
             value: progress.totalSessions,
             icon: Trophy,
-            color: "#F59E0B",
+            color: '#F59E0B',
           },
           {
-            label: "Current Streak",
+            label: 'Current Streak',
             value: `${progress.currentStreak}d`,
             icon: Flame,
-            color: "#EF4444",
+            color: '#EF4444',
           },
           {
-            label: "Practice Time",
+            label: 'Practice Time',
             value: formatDuration(progress.totalPracticeTime),
             icon: Clock,
-            color: "#3B82F6",
+            color: '#3B82F6',
           },
           {
-            label: "Best Score",
+            label: 'Best Score',
             value: `${progress.bestScore}%`,
             icon: TrendingUp,
-            color: "#8B5CF6",
+            color: '#8B5CF6',
           },
         ].map((stat, i) => (
           <div
             key={i}
             className={`stagger-${i + 1}`}
             style={{
-              padding: "16px 20px",
+              padding: '16px 20px',
               borderRadius: 14,
-              backgroundColor: "var(--bg-surface)",
-              border: "1px solid var(--border-default)",
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
             }}
           >
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 8,
                 marginBottom: 8,
               }}
@@ -235,9 +235,9 @@ export default function ProgressPage() {
                   height: 28,
                   borderRadius: 8,
                   backgroundColor: `${stat.color}15`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 <stat.icon
@@ -245,8 +245,8 @@ export default function ProgressPage() {
                 />
               </div>
               <span
-                className="text-caption"
-                style={{ color: "var(--text-muted)" }}
+                className='text-caption'
+                style={{ color: 'var(--text-muted)' }}
               >
                 {stat.label}
               </span>
@@ -255,7 +255,7 @@ export default function ProgressPage() {
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: "var(--text-primary)",
+                color: 'var(--text-primary)',
               }}
             >
               {stat.value}
@@ -264,7 +264,7 @@ export default function ProgressPage() {
               <div
                 style={{
                   fontSize: 12,
-                  color: "var(--text-secondary)",
+                  color: 'var(--text-secondary)',
                   marginTop: 2,
                 }}
               >
@@ -279,32 +279,32 @@ export default function ProgressPage() {
       <div
         style={{
           marginBottom: 32,
-          padding: "16px 20px",
+          padding: '16px 20px',
           borderRadius: 14,
-          backgroundColor: "var(--bg-surface)",
-          border: "1px solid var(--border-default)",
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
         }}
       >
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             marginBottom: 8,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Calendar style={{ width: 16, height: 16, color: "#6366F1" }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Calendar style={{ width: 16, height: 16, color: '#6366F1' }} />
             <span
-              className="text-label"
-              style={{ color: "var(--text-secondary)" }}
+              className='text-label'
+              style={{ color: 'var(--text-secondary)' }}
             >
               Weekly Target
             </span>
           </div>
           <span
-            className="font-code"
-            style={{ fontSize: 13, color: "var(--text-primary)" }}
+            className='font-code'
+            style={{ fontSize: 13, color: 'var(--text-primary)' }}
           >
             {progress.weeklyCompleted} / {progress.weeklyGoal} sessions
           </span>
@@ -313,17 +313,17 @@ export default function ProgressPage() {
           style={{
             height: 6,
             borderRadius: 3,
-            backgroundColor: "rgba(99,102,241,0.1)",
-            overflow: "hidden",
+            backgroundColor: 'rgba(99,102,241,0.1)',
+            overflow: 'hidden',
           }}
         >
           <div
             style={{
-              height: "100%",
+              height: '100%',
               width: `${weeklyPct}%`,
               borderRadius: 3,
-              background: "linear-gradient(90deg, #6366F1, #818CF8)",
-              transition: "width 600ms ease",
+              background: 'linear-gradient(90deg, #6366F1, #818CF8)',
+              transition: 'width 600ms ease',
             }}
           />
         </div>
@@ -332,8 +332,8 @@ export default function ProgressPage() {
       {/* Charts Row */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: 16,
           marginBottom: 32,
         }}
@@ -343,52 +343,52 @@ export default function ProgressPage() {
           style={{
             padding: 20,
             borderRadius: 16,
-            backgroundColor: "var(--bg-surface)",
-            border: "1px solid var(--border-default)",
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
           }}
         >
           <h3
-            className="text-label"
-            style={{ color: "var(--text-secondary)", marginBottom: 16 }}
+            className='text-label'
+            style={{ color: 'var(--text-secondary)', marginBottom: 16 }}
           >
             Score Trend (30 Days)
           </h3>
           <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width='100%' height='100%'>
               <AreaChart data={chartData}>
                 <defs>
-                  <linearGradient id="progressGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366F1" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#6366F1" stopOpacity={0} />
+                  <linearGradient id='progressGrad' x1='0' y1='0' x2='0' y2='1'>
+                    <stop offset='0%' stopColor='#6366F1' stopOpacity={0.3} />
+                    <stop offset='100%' stopColor='#6366F1' stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: "#666" }}
+                  dataKey='date'
+                  tick={{ fontSize: 10, fill: '#666' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   domain={[0, 100]}
-                  tick={{ fontSize: 10, fill: "#666" }}
+                  tick={{ fontSize: 10, fill: '#666' }}
                   axisLine={false}
                   tickLine={false}
                   width={30}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1A1A1A",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: '#1A1A1A',
+                    border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 8,
                     fontSize: 12,
                   }}
-                  labelStyle={{ color: "#888" }}
+                  labelStyle={{ color: '#888' }}
                 />
                 <Area
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#6366F1"
-                  fill="url(#progressGrad)"
+                  type='monotone'
+                  dataKey='score'
+                  stroke='#6366F1'
+                  fill='url(#progressGrad)'
                   strokeWidth={2}
                   dot={false}
                 />
@@ -402,29 +402,29 @@ export default function ProgressPage() {
           style={{
             padding: 20,
             borderRadius: 16,
-            backgroundColor: "var(--bg-surface)",
-            border: "1px solid var(--border-default)",
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
           }}
         >
           <h3
-            className="text-label"
-            style={{ color: "var(--text-secondary)", marginBottom: 16 }}
+            className='text-label'
+            style={{ color: 'var(--text-secondary)', marginBottom: 16 }}
           >
             Skill Breakdown
           </h3>
           <div style={{ height: 220 }}>
             {radarData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width='100%' height='100%'>
                 <RadarChart
                   data={radarData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius="70%"
+                  cx='50%'
+                  cy='50%'
+                  outerRadius='70%'
                 >
-                  <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                  <PolarGrid stroke='rgba(255,255,255,0.06)' />
                   <PolarAngleAxis
-                    dataKey="skill"
-                    tick={{ fontSize: 10, fill: "#888" }}
+                    dataKey='skill'
+                    tick={{ fontSize: 10, fill: '#888' }}
                   />
                   <PolarRadiusAxis
                     angle={90}
@@ -433,10 +433,10 @@ export default function ProgressPage() {
                     axisLine={false}
                   />
                   <Radar
-                    name="Score"
-                    dataKey="value"
-                    stroke="#6366F1"
-                    fill="#6366F1"
+                    name='Score'
+                    dataKey='value'
+                    stroke='#6366F1'
+                    fill='#6366F1'
                     fillOpacity={0.2}
                     strokeWidth={2}
                   />
@@ -445,11 +445,11 @@ export default function ProgressPage() {
             ) : (
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                  color: "var(--text-muted)",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  color: 'var(--text-muted)',
                   fontSize: 13,
                 }}
               >
@@ -465,31 +465,31 @@ export default function ProgressPage() {
         style={{
           padding: 20,
           borderRadius: 16,
-          backgroundColor: "var(--bg-surface)",
-          border: "1px solid var(--border-default)",
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
           marginBottom: 32,
         }}
       >
         <h3
-          className="text-label"
-          style={{ color: "var(--text-secondary)", marginBottom: 16 }}
+          className='text-label'
+          style={{ color: 'var(--text-secondary)', marginBottom: 16 }}
         >
           Activity (Last 12 Weeks)
         </h3>
-        <div style={{ display: "flex", gap: 3, justifyContent: "center" }}>
+        <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
           {heatmapWeeks.map((week, wi) => (
             <div
               key={wi}
-              style={{ display: "flex", flexDirection: "column", gap: 3 }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 3 }}
             >
               {week.map((day, di) => {
                 const intensity = Math.min(4, day.count);
                 const colors = [
-                  "rgba(255,255,255,0.04)",
-                  "rgba(99,102,241,0.2)",
-                  "rgba(99,102,241,0.4)",
-                  "rgba(99,102,241,0.6)",
-                  "rgba(99,102,241,0.9)",
+                  'rgba(255,255,255,0.04)',
+                  'rgba(99,102,241,0.2)',
+                  'rgba(99,102,241,0.4)',
+                  'rgba(99,102,241,0.6)',
+                  'rgba(99,102,241,0.9)',
                 ];
                 return (
                   <div
@@ -500,7 +500,7 @@ export default function ProgressPage() {
                       height: 12,
                       borderRadius: 3,
                       backgroundColor: colors[intensity],
-                      transition: "background-color 200ms ease",
+                      transition: 'background-color 200ms ease',
                     }}
                   />
                 );
@@ -510,9 +510,9 @@ export default function ProgressPage() {
         </div>
         <div
           style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
             gap: 4,
             marginTop: 8,
           }}
@@ -520,18 +520,18 @@ export default function ProgressPage() {
           <span
             style={{
               fontSize: 10,
-              color: "var(--text-disabled)",
+              color: 'var(--text-disabled)',
               marginRight: 4,
             }}
           >
             Less
           </span>
           {[
-            "rgba(255,255,255,0.04)",
-            "rgba(99,102,241,0.2)",
-            "rgba(99,102,241,0.4)",
-            "rgba(99,102,241,0.6)",
-            "rgba(99,102,241,0.9)",
+            'rgba(255,255,255,0.04)',
+            'rgba(99,102,241,0.2)',
+            'rgba(99,102,241,0.4)',
+            'rgba(99,102,241,0.6)',
+            'rgba(99,102,241,0.9)',
           ].map((c, i) => (
             <div
               key={i}
@@ -546,7 +546,7 @@ export default function ProgressPage() {
           <span
             style={{
               fontSize: 10,
-              color: "var(--text-disabled)",
+              color: 'var(--text-disabled)',
               marginLeft: 4,
             }}
           >
@@ -561,17 +561,17 @@ export default function ProgressPage() {
           style={{
             padding: 20,
             borderRadius: 16,
-            backgroundColor: "var(--bg-surface)",
-            border: "1px solid var(--border-default)",
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
           }}
         >
           <h3
-            className="text-label"
-            style={{ color: "var(--text-secondary)", marginBottom: 16 }}
+            className='text-label'
+            style={{ color: 'var(--text-secondary)', marginBottom: 16 }}
           >
             Skill Details
           </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {progress.skillBreakdown
               .sort((a, b) => b.score - a.score)
               .map((skill, i) => {
@@ -580,8 +580,8 @@ export default function ProgressPage() {
                   <div key={i}>
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        justifyContent: 'space-between',
                         marginBottom: 6,
                       }}
                     >
@@ -589,14 +589,14 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 13,
                           fontWeight: 500,
-                          color: "var(--text-primary)",
-                          textTransform: "capitalize",
+                          color: 'var(--text-primary)',
+                          textTransform: 'capitalize',
                         }}
                       >
-                        {skill.skill.replace(/_/g, " ")}
+                        {skill.skill.replace(/_/g, ' ')}
                       </span>
                       <span
-                        className="font-code"
+                        className='font-code'
                         style={{ fontSize: 13, fontWeight: 600, color }}
                       >
                         {skill.score}%
@@ -606,17 +606,17 @@ export default function ProgressPage() {
                       style={{
                         height: 4,
                         borderRadius: 2,
-                        backgroundColor: "rgba(255,255,255,0.06)",
-                        overflow: "hidden",
+                        backgroundColor: 'rgba(255,255,255,0.06)',
+                        overflow: 'hidden',
                       }}
                     >
                       <div
                         style={{
-                          height: "100%",
+                          height: '100%',
                           width: `${skill.score}%`,
                           borderRadius: 2,
                           backgroundColor: color,
-                          transition: "width 600ms ease",
+                          transition: 'width 600ms ease',
                         }}
                       />
                     </div>
