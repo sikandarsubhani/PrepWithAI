@@ -7,79 +7,79 @@
 // ─── Core Enums ───────────────────────────────────
 
 export type InterviewType =
-  | "dsa"
-  | "system_design"
-  | "behavioral"
-  | "frontend"
-  | "backend"
-  | "full_loop"
-  | "devops"
-  | "mobile"
-  | "machine_learning"
-  | "product_management"
-  | "leadership"
-  | "full_stack";
+  | 'dsa'
+  | 'system_design'
+  | 'behavioral'
+  | 'frontend'
+  | 'backend'
+  | 'full_loop'
+  | 'devops'
+  | 'mobile'
+  | 'machine_learning'
+  | 'product_management'
+  | 'leadership'
+  | 'full_stack';
 
 export type CompanySlug =
-  | "google"
-  | "meta"
-  | "amazon"
-  | "apple"
-  | "netflix"
-  | "microsoft"
-  | "stripe"
-  | "shopify"
-  | "airbnb"
-  | "uber"
-  | "lyft"
-  | "notion"
-  | "systems_limited"
-  | "techlogix"
-  | "10pearls"
-  | "netsol"
-  | "arbisoft"
-  | "gitlab"
-  | "automattic"
-  | "toptal"
-  | "general";
+  | 'google'
+  | 'meta'
+  | 'amazon'
+  | 'apple'
+  | 'netflix'
+  | 'microsoft'
+  | 'stripe'
+  | 'shopify'
+  | 'airbnb'
+  | 'uber'
+  | 'lyft'
+  | 'notion'
+  | 'systems_limited'
+  | 'techlogix'
+  | '10pearls'
+  | 'netsol'
+  | 'arbisoft'
+  | 'gitlab'
+  | 'automattic'
+  | 'toptal'
+  | 'general';
 
-export type DifficultyLevel = "junior" | "mid" | "senior" | "staff";
+export type DifficultyLevel = 'junior' | 'mid' | 'senior' | 'staff';
 
-export type PlanType = "free" | "pro" | "team" | "enterprise";
+export type PlanType = 'free' | 'pro' | 'team' | 'enterprise';
 
-export type QuestionDifficulty = "easy" | "medium" | "hard";
+export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
 
 export type QuestionCategory =
-  | "array"
-  | "string"
-  | "linkedlist"
-  | "tree"
-  | "graph"
-  | "dp"
-  | "sorting"
-  | "bit_manipulation"
-  | "math"
-  | "sliding_window"
-  | "two_pointers"
-  | "stack_queue"
-  | "heap"
-  | "system_design"
-  | "behavioral"
-  | "frontend"
-  | "backend"
-  | "sql"
-  | "devops"
-  | "react"
-  | "javascript"
-  | "typescript"
-  | "css"
-  | "api_design"
-  | "database"
-  | "caching"
-  | "auth"
-  | "microservices";
+  | 'array'
+  | 'string'
+  | 'linkedlist'
+  | 'tree'
+  | 'graph'
+  | 'dp'
+  | 'sorting'
+  | 'bit_manipulation'
+  | 'math'
+  | 'sliding_window'
+  | 'two_pointers'
+  | 'stack_queue'
+  | 'heap'
+  | 'system_design'
+  | 'behavioral'
+  | 'frontend'
+  | 'backend'
+  | 'sql'
+  | 'devops'
+  | 'react'
+  | 'javascript'
+  | 'typescript'
+  | 'css'
+  | 'api_design'
+  | 'database'
+  | 'caching'
+  | 'auth'
+  | 'microservices';
 
-export type CodeLanguage = "javascript" | "python" | "java" | "cpp";
+export type CodeLanguage = 'javascript' | 'python' | 'java' | 'cpp';
 
 // ─── User ────────────────────────────────────────
 
@@ -196,7 +196,7 @@ export interface SessionGrades {
 
 export interface Message {
   id: string;
-  role: "interviewer" | "candidate";
+  role: 'interviewer' | 'candidate';
   content: string;
   timestamp: string;
   isVoice: boolean;
@@ -348,7 +348,7 @@ export interface CompanyPrepPack {
   description: string;
   logo: string;
   color: string;
-  region: "faang" | "top_startup" | "pakistan" | "remote";
+  region: 'faang' | 'top_startup' | 'pakistan' | 'remote';
   interviewFormat: string;
   culture: string;
   rounds: InterviewRound[];
@@ -379,7 +379,7 @@ export interface PrepDay {
 export interface InterviewExperience {
   role: string;
   level: string;
-  outcome: "accepted" | "rejected" | "pending";
+  outcome: 'accepted' | 'rejected' | 'pending';
   date: string;
   rounds: { type: string; questions: string[]; difficulty: string }[];
   tips: string;
@@ -412,7 +412,7 @@ export interface StudyGroupMember {
   userId: string;
   userName: string;
   userImage?: string;
-  role: "owner" | "admin" | "member";
+  role: 'owner' | 'admin' | 'member';
   joinedAt: string;
 }
 
@@ -552,7 +552,7 @@ export interface CodeExecutionResult {
 // ─── AI Chat ─────────────────────────────────────
 
 export interface AIMessage {
-  role: "system" | "user" | "assistant";
+  role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
@@ -570,7 +570,7 @@ export interface ApiResponse<T = unknown> {
 export interface Notification {
   _id: string;
   userId: string;
-  type: "achievement" | "streak" | "challenge" | "social" | "system";
+  type: 'achievement' | 'streak' | 'challenge' | 'social' | 'system';
   title: string;
   message: string;
   read: boolean;
@@ -586,7 +586,7 @@ export interface CoverLetter {
   jobTitle: string;
   company: string;
   content: string;
-  tone: "formal" | "friendly" | "startup";
+  tone: 'formal' | 'friendly' | 'startup';
   createdAt: string;
 }
 

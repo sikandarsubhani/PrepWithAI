@@ -5,14 +5,14 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // ─── Interface ──────────────────────────────────────
 
 export interface IQuestion extends Document {
   title: string;
   description: string;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   subcategory: string;
   companies: string[];
@@ -63,18 +63,18 @@ const QuestionSchema = new Schema<IQuestion>(
   {
     title: {
       type: String,
-      required: [true, "Question title is required"],
+      required: [true, 'Question title is required'],
       trim: true,
       maxlength: 200,
     },
     description: {
       type: String,
-      required: [true, "Question description is required"],
+      required: [true, 'Question description is required'],
       maxlength: 5000,
     },
     difficulty: {
       type: String,
-      enum: ["easy", "medium", "hard"],
+      enum: ['easy', 'medium', 'hard'],
       required: true,
       index: true,
     },
@@ -158,13 +158,14 @@ QuestionSchema.index({ tags: 1 });
 QuestionSchema.index({ solvedCount: -1 });
 QuestionSchema.index({ successRate: 1 });
 QuestionSchema.index(
-  { title: "text", description: "text", tags: "text" },
+  { title: 'text', description: 'text', tags: 'text' },
   { weights: { title: 10, tags: 5, description: 1 } }
 );
 
 // ─── Export ─────────────────────────────────────────
 
 const QuestionModel: Model<IQuestion> =
-  mongoose.models.Question || mongoose.model<IQuestion>("Question", QuestionSchema);
+  mongoose.models.Question ||
+  mongoose.model<IQuestion>('Question', QuestionSchema);
 
 export default QuestionModel;

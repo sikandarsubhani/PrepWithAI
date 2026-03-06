@@ -3,22 +3,22 @@
 // Controls search engine crawling
 // ===========================================
 
-import { MetadataRoute } from "next";
+import { MetadataRoute } from 'next';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://prepwithai.com";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://prepwithai.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
+        userAgent: '*',
+        allow: '/',
         disallow: [
-          "/api/",
-          "/dashboard/",
-          "/interview/*/report",
-          "/settings/",
-          "/onboarding/",
+          '/api/',
+          '/dashboard/',
+          '/interview/*/report',
+          '/settings/',
+          '/onboarding/',
         ],
       },
     ],

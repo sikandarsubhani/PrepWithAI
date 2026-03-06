@@ -5,13 +5,13 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
 if (!MONGODB_URI) {
   throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
+    'Please define the MONGODB_URI environment variable inside .env.local'
   );
 }
 
@@ -56,18 +56,18 @@ async function dbConnect(): Promise<typeof mongoose> {
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(MONGODB_URI, connectionOptions)
-      .then((mongooseInstance) => {
-        console.log("✅ MongoDB connected successfully");
+      .then(mongooseInstance => {
+        console.log('✅ MongoDB connected successfully');
         return mongooseInstance;
       });
 
     // Register connection event handlers (once)
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err);
+    mongoose.connection.on('error', err => {
+      console.error('❌ MongoDB connection error:', err);
     });
 
-    mongoose.connection.on("disconnected", () => {
-      console.warn("⚠️ MongoDB disconnected. Will reconnect on next request.");
+    mongoose.connection.on('disconnected', () => {
+      console.warn('⚠️ MongoDB disconnected. Will reconnect on next request.');
       cached.conn = null;
       cached.promise = null;
     });

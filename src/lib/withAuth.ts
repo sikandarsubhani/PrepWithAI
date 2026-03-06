@@ -5,10 +5,10 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
-import { unauthorized, serverError } from "@/lib/response";
-import dbConnect from "@/lib/mongodb";
+import { NextRequest } from 'next/server';
+import { auth } from '@/lib/auth';
+import { unauthorized, serverError } from '@/lib/response';
+import dbConnect from '@/lib/mongodb';
 
 // ─── Types ──────────────────────────────────────────
 
@@ -33,9 +33,7 @@ type RouteHandler = (
   context: AuthContext
 ) => Promise<Response>;
 
-type RouteHandlerNoContext = (
-  req: NextRequest
-) => Promise<Response>;
+type RouteHandlerNoContext = (req: NextRequest) => Promise<Response>;
 
 // ─── withAuth HOF ───────────────────────────────────
 
@@ -48,7 +46,7 @@ export function withAuth(handler: RouteHandler | RouteHandlerNoContext) {
       const session = await auth();
 
       if (!session?.user?.id) {
-        return unauthorized("Authentication required");
+        return unauthorized('Authentication required');
       }
 
       await dbConnect();
@@ -64,8 +62,8 @@ export function withAuth(handler: RouteHandler | RouteHandlerNoContext) {
 
       return handler(req, authContext);
     } catch (error) {
-      console.error("[withAuth] Error:", error);
-      return serverError("Authentication error", error);
+      console.error('[withAuth] Error:', error);
+      return serverError('Authentication error', error);
     }
   };
 }
@@ -75,11 +73,11 @@ export function withAuth(handler: RouteHandler | RouteHandlerNoContext) {
 export function withAdmin(handler: RouteHandler) {
   return withAuth(async (req: NextRequest, context: AuthContext) => {
     // Check admin role from database
-    const { default: User } = await import("@/models/User");
-    const user = await User.findById(context.user.id).select("role").lean();
+    const { default: User } = await import('@/models/User');
+    const user = await User.findById(context.user.id).select('role').lean();
 
-    if (!user || (user as { role?: string }).role !== "admin") {
-      return unauthorized("Admin access required");
+    if (!user || (user as { role?: string }).role !== 'admin') {
+      return unauthorized('Admin access required');
     }
 
     return handler(req, context);

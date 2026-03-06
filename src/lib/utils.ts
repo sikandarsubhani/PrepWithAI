@@ -3,9 +3,9 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { ELO_CONFIG, FILLER_WORDS, FREE_TRIAL_DAYS } from "./constants";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { ELO_CONFIG, FILLER_WORDS, FREE_TRIAL_DAYS } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,7 +19,10 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function isOnProTrial(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _user: { plan: string; proTrialEndsAt?: Date | string | null } | null | undefined
+  _user:
+    | { plan: string; proTrialEndsAt?: Date | string | null }
+    | null
+    | undefined
 ): boolean {
   return false;
 }
@@ -39,9 +42,12 @@ export function proTrialDaysRemaining(
  */
 export function effectivePlan(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _user: { plan: string; proTrialEndsAt?: Date | string | null } | null | undefined
+  _user:
+    | { plan: string; proTrialEndsAt?: Date | string | null }
+    | null
+    | undefined
 ): string {
-  return "pro";
+  return 'pro';
 }
 
 /**
@@ -59,26 +65,28 @@ export function calculateTrialEndDate(startDate?: Date): Date {
  */
 export function canAccessProFeature(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _user: { plan: string; proTrialEndsAt?: Date | string | null } | null | undefined
+  _user:
+    | { plan: string; proTrialEndsAt?: Date | string | null }
+    | null
+    | undefined
 ): boolean {
   return true;
 }
 
-
 // ─── Formatting ─────────────────────────────────
 
 export function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 }
 
 export function formatDateShort(date: Date | string): string {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
   });
 }
 
@@ -90,7 +98,7 @@ export function formatRelativeTime(date: Date | string): string {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return "just now";
+  if (diffMins < 1) return 'just now';
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
@@ -122,15 +130,18 @@ export function formatNumber(num: number): string {
   return num.toString();
 }
 
-export function formatCurrency(amount: number, currency: string = "USD"): string {
-  if (currency === "PKR") {
+export function formatCurrency(
+  amount: number,
+  currency: string = 'USD'
+): string {
+  if (currency === 'PKR') {
     return `PKR ${amount.toLocaleString()}`;
   }
-  if (currency === "USD/hr") {
+  if (currency === 'USD/hr') {
     return `$${amount}/hr`;
   }
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
     currency,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -139,47 +150,47 @@ export function formatCurrency(amount: number, currency: string = "USD"): string
 // ─── Score Helpers ──────────────────────────────
 
 export function getScoreColor(score: number): string {
-  if (score >= 90) return "text-emerald-400";
-  if (score >= 80) return "text-green-400";
-  if (score >= 70) return "text-yellow-400";
-  if (score >= 60) return "text-orange-400";
-  if (score >= 50) return "text-orange-500";
-  return "text-red-500";
+  if (score >= 90) return 'text-emerald-400';
+  if (score >= 80) return 'text-green-400';
+  if (score >= 70) return 'text-yellow-400';
+  if (score >= 60) return 'text-orange-400';
+  if (score >= 50) return 'text-orange-500';
+  return 'text-red-500';
 }
 
 export function getScoreBgColor(score: number): string {
-  if (score >= 90) return "bg-emerald-500/10 border-emerald-500/20";
-  if (score >= 80) return "bg-green-500/10 border-green-500/20";
-  if (score >= 70) return "bg-yellow-500/10 border-yellow-500/20";
-  if (score >= 60) return "bg-orange-500/10 border-orange-500/20";
-  return "bg-red-500/10 border-red-500/20";
+  if (score >= 90) return 'bg-emerald-500/10 border-emerald-500/20';
+  if (score >= 80) return 'bg-green-500/10 border-green-500/20';
+  if (score >= 70) return 'bg-yellow-500/10 border-yellow-500/20';
+  if (score >= 60) return 'bg-orange-500/10 border-orange-500/20';
+  return 'bg-red-500/10 border-red-500/20';
 }
 
 export function getScoreLabel(score: number): string {
-  if (score >= 95) return "Exceptional";
-  if (score >= 90) return "Outstanding";
-  if (score >= 85) return "Excellent";
-  if (score >= 80) return "Strong";
-  if (score >= 75) return "Good";
-  if (score >= 70) return "Above Average";
-  if (score >= 65) return "Average";
-  if (score >= 60) return "Below Average";
-  if (score >= 50) return "Needs Work";
-  return "Needs Improvement";
+  if (score >= 95) return 'Exceptional';
+  if (score >= 90) return 'Outstanding';
+  if (score >= 85) return 'Excellent';
+  if (score >= 80) return 'Strong';
+  if (score >= 75) return 'Good';
+  if (score >= 70) return 'Above Average';
+  if (score >= 65) return 'Average';
+  if (score >= 60) return 'Below Average';
+  if (score >= 50) return 'Needs Work';
+  return 'Needs Improvement';
 }
 
 export function getScoreGrade(score: number): string {
-  if (score >= 93) return "A+";
-  if (score >= 90) return "A";
-  if (score >= 87) return "A-";
-  if (score >= 83) return "B+";
-  if (score >= 80) return "B";
-  if (score >= 77) return "B-";
-  if (score >= 73) return "C+";
-  if (score >= 70) return "C";
-  if (score >= 67) return "C-";
-  if (score >= 60) return "D";
-  return "F";
+  if (score >= 93) return 'A+';
+  if (score >= 90) return 'A';
+  if (score >= 87) return 'A-';
+  if (score >= 83) return 'B+';
+  if (score >= 80) return 'B';
+  if (score >= 77) return 'B-';
+  if (score >= 73) return 'C+';
+  if (score >= 70) return 'C';
+  if (score >= 67) return 'C-';
+  if (score >= 60) return 'D';
+  return 'F';
 }
 
 export function getPercentile(score: number): number {
@@ -204,9 +215,11 @@ export function calculateNewElo(
   score: number,
   maxScore: number = 100
 ): number {
-  const expectedScore = 1 / (1 + Math.pow(10, (questionDifficulty - currentRating) / 400));
+  const expectedScore =
+    1 / (1 + Math.pow(10, (questionDifficulty - currentRating) / 400));
   const actualScore = score / maxScore;
-  const newRating = currentRating + ELO_CONFIG.kFactor * (actualScore - expectedScore);
+  const newRating =
+    currentRating + ELO_CONFIG.kFactor * (actualScore - expectedScore);
   return Math.max(
     ELO_CONFIG.minRating,
     Math.min(ELO_CONFIG.maxRating, Math.round(newRating))
@@ -214,10 +227,8 @@ export function calculateNewElo(
 }
 
 export function getEloLevel(rating: number): { name: string; color: string } {
-  const level = ELO_CONFIG.levels.find(
-    (l) => rating >= l.min && rating < l.max
-  );
-  return level || { name: "Beginner", color: "#6b7280" };
+  const level = ELO_CONFIG.levels.find(l => rating >= l.min && rating < l.max);
+  return level || { name: 'Beginner', color: '#6b7280' };
 }
 
 export function getEloDifficultyForRating(rating: number): number {
@@ -231,7 +242,7 @@ export function countFillerWords(text: string): Record<string, number> {
   const lower = text.toLowerCase();
   const counts: Record<string, number> = {};
   for (const filler of FILLER_WORDS) {
-    const regex = new RegExp(`\\b${filler}\\b`, "gi");
+    const regex = new RegExp(`\\b${filler}\\b`, 'gi');
     const matches = lower.match(regex);
     if (matches && matches.length > 0) {
       counts[filler] = matches.length;
@@ -247,25 +258,26 @@ export function calculateWPM(text: string, durationSeconds: number): number {
 }
 
 export function getSpeakingFeedback(wpm: number): string {
-  if (wpm < 100) return "Too slow — try to speak a bit faster for clarity";
-  if (wpm < 120) return "Slightly slow — good for complex explanations, pick up pace for simple ones";
-  if (wpm <= 160) return "Perfect pace — clear and easy to follow";
-  if (wpm <= 180) return "Slightly fast — slow down a bit for complex topics";
-  return "Too fast — slow down, your interviewer may struggle to follow";
+  if (wpm < 100) return 'Too slow — try to speak a bit faster for clarity';
+  if (wpm < 120)
+    return 'Slightly slow — good for complex explanations, pick up pace for simple ones';
+  if (wpm <= 160) return 'Perfect pace — clear and easy to follow';
+  if (wpm <= 180) return 'Slightly fast — slow down a bit for complex topics';
+  return 'Too fast — slow down, your interviewer may struggle to follow';
 }
 
 // ─── String Helpers ─────────────────────────────
 
 export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
-  return str.slice(0, length) + "...";
+  return str.slice(0, length) + '...';
 }
 
 export function slugify(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 export function capitalize(str: string): string {
@@ -274,11 +286,11 @@ export function capitalize(str: string): string {
 
 export function formatInterviewType(type: string): string {
   return type
-    .replace(/_/g, " ")
-    .replace(/-/g, " ")
-    .split(" ")
+    .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
+    .split(' ')
     .map(capitalize)
-    .join(" ");
+    .join(' ');
 }
 
 // ─── ID Generation ──────────────────────────────
@@ -290,7 +302,7 @@ export function generateId(): string {
 // ─── Async ──────────────────────────────────────
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // ─── Streak ─────────────────────────────────────
@@ -299,7 +311,7 @@ export function calculateStreak(dates: Date[]): number {
   if (dates.length === 0) return 0;
 
   const sorted = dates
-    .map((d) => new Date(d))
+    .map(d => new Date(d))
     .sort((a, b) => b.getTime() - a.getTime());
 
   const today = new Date();
@@ -345,7 +357,7 @@ export function generateHeatmapData(
 ): { date: string; count: number; level: number }[] {
   const map = new Map<string, number>();
   for (const d of dailyScores) {
-    const key = new Date(d.date).toISOString().split("T")[0];
+    const key = new Date(d.date).toISOString().split('T')[0];
     map.set(key, (map.get(key) || 0) + d.sessions);
   }
 
@@ -355,9 +367,10 @@ export function generateHeatmapData(
   for (let i = days; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    const key = date.toISOString().split("T")[0];
+    const key = date.toISOString().split('T')[0];
     const count = map.get(key) || 0;
-    const level = count === 0 ? 0 : count <= 1 ? 1 : count <= 3 ? 2 : count <= 5 ? 3 : 4;
+    const level =
+      count === 0 ? 0 : count <= 1 ? 1 : count <= 3 ? 2 : count <= 5 ? 3 : 4;
     result.push({ date: key, count, level });
   }
 
@@ -367,14 +380,14 @@ export function generateHeatmapData(
 // ─── Chart Colors ───────────────────────────────
 
 export const CHART_COLORS = [
-  "#8b5cf6", // violet
-  "#3b82f6", // blue
-  "#10b981", // emerald
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#84cc16", // lime
+  '#8b5cf6', // violet
+  '#3b82f6', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#ec4899', // pink
+  '#06b6d4', // cyan
+  '#84cc16', // lime
 ];
 
 // ─── Validation ─────────────────────────────────
@@ -384,5 +397,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isStrongPassword(password: string): boolean {
-  return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+  return (
+    password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)
+  );
 }

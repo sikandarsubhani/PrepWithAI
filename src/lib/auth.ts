@@ -1,12 +1,12 @@
-﻿import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import GitHub from "next-auth/providers/github";
-import bcrypt from "bcryptjs";
-import connectDB from "./mongodb";
-import User from "@/models/User";
+﻿import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import GitHub from 'next-auth/providers/github';
+import bcrypt from 'bcryptjs';
+import connectDB from './mongodb';
+import User from '@/models/User';
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
@@ -47,23 +47,23 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
 allProviders.push(
   Credentials({
     credentials: {
-      email: { label: "Email", type: "email" },
-      password: { label: "Password", type: "password" },
+      email: { label: 'Email', type: 'email' },
+      password: { label: 'Password', type: 'password' },
     },
     async authorize(credentials) {
       const email = credentials?.email as string;
       const password = credentials?.password as string;
       if (!email || !password) {
-        throw new Error("Please enter email and password");
+        throw new Error('Please enter email and password');
       }
       await connectDB();
-      const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({ email }).select('+password');
       if (!user || !user.password) {
-        throw new Error("Invalid email or password");
+        throw new Error('Invalid email or password');
       }
       const isValid = await bcrypt.compare(password, user.password as string);
       if (!isValid) {
-        throw new Error("Invalid email or password");
+        throw new Error('Invalid email or password');
       }
       return {
         id: user._id.toString(),
@@ -79,34 +79,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: allProviders,
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "google" || account?.provider === "github") {
+      if (account?.provider === 'google' || account?.provider === 'github') {
         await connectDB();
         const existingUser = await User.findOne({ email: user.email });
         if (!existingUser) {
           await User.create({
-            name: user.name || "",
-            email: user.email || "",
-            image: user.image || "",
-            plan: "pro",
+            name: user.name || '',
+            email: user.email || '',
+            image: user.image || '',
+            plan: 'pro',
           });
-        } else if (existingUser.plan !== "pro") {
-          existingUser.plan = "pro";
+        } else if (existingUser.plan !== 'pro') {
+          existingUser.plan = 'pro';
           await existingUser.save();
         }
       }
       return true;
     },
     async jwt({ token, user, trigger }) {
-      if (user || trigger === "update") {
+      if (user || trigger === 'update') {
         await connectDB();
-        const dbUser = await User.findOne({ email: token.email || user?.email });
+        const dbUser = await User.findOne({
+          email: token.email || user?.email,
+        });
         if (dbUser) {
-          if (dbUser.plan !== "pro") {
-            dbUser.plan = "pro";
+          if (dbUser.plan !== 'pro') {
+            dbUser.plan = 'pro';
             await dbUser.save();
           }
           token.id = dbUser._id.toString();
-          token.plan = "pro";
+          token.plan = 'pro';
           token.onboarded = dbUser.onboarded;
           token.eloRating = dbUser.eloRating;
           token.currentStreak = dbUser.currentStreak;
@@ -116,10 +118,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.plan = "pro";
+        session.user.plan = 'pro';
         session.user.onboarded = token.onboarded as boolean;
         session.user.eloRating = (token.eloRating as number) || 1200;
         session.user.currentStreak = (token.currentStreak as number) || 0;
@@ -130,11 +132,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: "/login",
-    newUser: "/onboarding",
+    signIn: '/login',
+    newUser: '/onboarding',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

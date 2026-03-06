@@ -5,14 +5,14 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import mongoose, { Schema, Document, Model } from "mongoose";
-import { nanoid } from "nanoid";
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import { nanoid } from 'nanoid';
 
 // ─── Sub-interfaces ─────────────────────────────────
 
 export interface IMessage {
   id: string;
-  role: "interviewer" | "candidate";
+  role: 'interviewer' | 'candidate';
   content: string;
   timestamp: Date;
   isVoice: boolean;
@@ -130,27 +130,27 @@ const SessionSchema = new Schema<ISession>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       index: true,
     },
     type: {
       type: String,
-      required: [true, "Interview type is required"],
+      required: [true, 'Interview type is required'],
       trim: true,
     },
     company: {
       type: String,
       required: true,
-      default: "general",
+      default: 'general',
       trim: true,
       lowercase: true,
     },
     difficulty: {
       type: String,
       required: true,
-      default: "mid",
-      enum: ["junior", "mid", "senior", "staff"],
+      default: 'mid',
+      enum: ['junior', 'mid', 'senior', 'staff'],
     },
     voiceMode: { type: Boolean, default: false },
     videoMode: { type: Boolean, default: false },
@@ -162,7 +162,7 @@ const SessionSchema = new Schema<ISession>(
         id: { type: String, required: true },
         role: {
           type: String,
-          enum: ["interviewer", "candidate"],
+          enum: ['interviewer', 'candidate'],
           required: true,
         },
         content: { type: String, required: true },
@@ -174,7 +174,7 @@ const SessionSchema = new Schema<ISession>(
     ],
     questions: [
       {
-        questionId: { type: Schema.Types.ObjectId, ref: "Question" },
+        questionId: { type: Schema.Types.ObjectId, ref: 'Question' },
         title: { type: String },
         userAnswer: { type: String },
         codeAnswer: { type: String },
@@ -268,19 +268,22 @@ SessionSchema.index({ company: 1, overallScore: -1 });
 
 // ─── Pre-save Middleware ────────────────────────────
 
-SessionSchema.pre("save", function () {
+SessionSchema.pre('save', function () {
   // Auto-calculate voice metrics from messages
-  const voiceMessages = this.messages.filter((m) => m.isVoice && m.role === "candidate");
+  const voiceMessages = this.messages.filter(
+    m => m.isVoice && m.role === 'candidate'
+  );
   if (voiceMessages.length > 0) {
     const confidences = voiceMessages
-      .map((m) => m.transcriptConfidence)
+      .map(m => m.transcriptConfidence)
       .filter((c): c is number => c !== undefined && c !== null);
     if (confidences.length > 0) {
-      this.avgTranscriptConfidence = confidences.reduce((a, b) => a + b, 0) / confidences.length;
+      this.avgTranscriptConfidence =
+        confidences.reduce((a, b) => a + b, 0) / confidences.length;
     }
 
     const wpms = voiceMessages
-      .map((m) => m.wordsPerMinute)
+      .map(m => m.wordsPerMinute)
       .filter((w): w is number => w !== undefined && w !== null);
     if (wpms.length > 0) {
       this.avgWordsPerMinute = wpms.reduce((a, b) => a + b, 0) / wpms.length;
@@ -288,11 +291,13 @@ SessionSchema.pre("save", function () {
   }
 
   // Auto-count questions answered
-  this.questionsAnswered = this.questions.filter((q) => q.userAnswer || q.codeAnswer).length;
+  this.questionsAnswered = this.questions.filter(
+    q => q.userAnswer || q.codeAnswer
+  ).length;
 
   // Auto-count words spoken by candidate
   this.wordsSpoken = this.messages
-    .filter((m) => m.role === "candidate")
+    .filter(m => m.role === 'candidate')
     .reduce((sum, m) => sum + (m.content?.split(/\s+/).length || 0), 0);
 });
 
@@ -307,6 +312,6 @@ SessionSchema.methods.generateShareToken = function (): string {
 // ─── Export ─────────────────────────────────────────
 
 const SessionModel: Model<ISession> =
-  mongoose.models.Session || mongoose.model<ISession>("Session", SessionSchema);
+  mongoose.models.Session || mongoose.model<ISession>('Session', SessionSchema);
 
 export default SessionModel;

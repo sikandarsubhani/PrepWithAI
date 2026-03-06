@@ -5,7 +5,7 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // ─── Interface ──────────────────────────────────────
 
@@ -28,7 +28,7 @@ const ApiUsageSchema = new Schema<IApiUsage>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       index: true,
     },
     date: {
@@ -39,7 +39,7 @@ const ApiUsageSchema = new Schema<IApiUsage>(
     provider: {
       type: String,
       required: true,
-      default: "groq",
+      default: 'groq',
       trim: true,
     },
     totalCalls: { type: Number, default: 0, min: 0 },
@@ -60,6 +60,7 @@ ApiUsageSchema.index({ date: -1 });
 // ─── Export ─────────────────────────────────────────
 
 const ApiUsageModel: Model<IApiUsage> =
-  mongoose.models.ApiUsage || mongoose.model<IApiUsage>("ApiUsage", ApiUsageSchema);
+  mongoose.models.ApiUsage ||
+  mongoose.model<IApiUsage>('ApiUsage', ApiUsageSchema);
 
 export default ApiUsageModel;

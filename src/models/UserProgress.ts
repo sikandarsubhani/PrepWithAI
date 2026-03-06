@@ -5,7 +5,7 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // ─── Interface ──────────────────────────────────────
 
@@ -75,7 +75,7 @@ const UserProgressSchema = new Schema<IUserProgress>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       unique: true,
     },
@@ -135,7 +135,7 @@ const UserProgressSchema = new Schema<IUserProgress>(
     companiesReadiness: { type: Map, of: Number, default: new Map() },
 
     // Problem tracking
-    solvedProblems: [{ type: Schema.Types.ObjectId, ref: "Question" }],
+    solvedProblems: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
 
     // Goals & insights
     weeklyGoal: { type: Number, default: 5, min: 1, max: 30 },
@@ -157,6 +157,6 @@ UserProgressSchema.index({ eloRating: -1 });
 
 const UserProgressModel: Model<IUserProgress> =
   mongoose.models.UserProgress ||
-  mongoose.model<IUserProgress>("UserProgress", UserProgressSchema);
+  mongoose.model<IUserProgress>('UserProgress', UserProgressSchema);
 
 export default UserProgressModel;

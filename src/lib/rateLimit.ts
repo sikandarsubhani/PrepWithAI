@@ -17,14 +17,17 @@ interface RateLimitEntry {
 const store = new Map<string, RateLimitEntry>();
 
 // Cleanup old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (entry.resetAt <= now) {
-      store.delete(key);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, entry] of store) {
+      if (entry.resetAt <= now) {
+        store.delete(key);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  },
+  5 * 60 * 1000
+);
 
 // ─── Rate Limit Check ───────────────────────────────
 

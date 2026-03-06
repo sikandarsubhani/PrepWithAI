@@ -4,20 +4,23 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { Resend } from "resend";
+import { Resend } from 'resend';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
-const FROM_EMAIL = process.env.FROM_EMAIL || "PrepWithAI <noreply@prepwithai.com>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const FROM_EMAIL =
+  process.env.FROM_EMAIL || 'PrepWithAI <noreply@prepwithai.com>';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 // ─── Welcome Email ────────────────────────────────
 
 export async function sendWelcomeEmail(to: string, name: string) {
-  const firstName = name.split(" ")[0];
+  const firstName = name.split(' ')[0];
 
   try {
-    if (!resend) return { success: false, error: "Email not configured" };
+    if (!resend) return { success: false, error: 'Email not configured' };
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
@@ -31,7 +34,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 </head>
 <body style="margin:0;padding:0;background:#080808;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:600px;margin:0 auto;padding:40px 24px;">
-    
+
     <!-- Logo -->
     <div style="text-align:center;margin-bottom:32px;">
       <div style="display:inline-flex;align-items:center;gap:8px;">
@@ -48,7 +51,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
         Welcome aboard, ${firstName}! 🎉
       </h1>
       <p style="color:#A3A3A3;font-size:16px;line-height:1.6;margin:0;">
-        You just joined the smartest way to prepare for technical interviews. 
+        You just joined the smartest way to prepare for technical interviews.
         All features are unlocked — start practicing now!
       </p>
     </div>
@@ -79,7 +82,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
     <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:20px;margin-bottom:32px;">
       <p style="color:#10b981;font-size:14px;font-weight:600;margin:0 0 4px;">💡 Pro tip</p>
       <p style="color:#A3A3A3;font-size:14px;margin:0;">
-        Start with a DSA interview to calibrate your skill level. The AI adapts to your performance 
+        Start with a DSA interview to calibrate your skill level. The AI adapts to your performance
         and gives you progressively harder questions.
       </p>
     </div>
@@ -97,23 +100,27 @@ export async function sendWelcomeEmail(to: string, name: string) {
     });
     return { success: true };
   } catch (error) {
-    console.error("Failed to send welcome email:", error);
+    console.error('Failed to send welcome email:', error);
     return { success: false, error };
   }
 }
 
 // ─── Password Reset Email ─────────────────────────
 
-export async function sendPasswordResetEmail(to: string, name: string, resetToken: string) {
-  const firstName = name.split(" ")[0];
+export async function sendPasswordResetEmail(
+  to: string,
+  name: string,
+  resetToken: string
+) {
+  const firstName = name.split(' ')[0];
   const resetUrl = `${APP_URL}/reset-password?token=${resetToken}`;
 
   try {
-    if (!resend) return { success: false, error: "Email not configured" };
+    if (!resend) return { success: false, error: 'Email not configured' };
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: "Reset your PrepWithAI password",
+      subject: 'Reset your PrepWithAI password',
       html: `
 <!DOCTYPE html>
 <html>
@@ -161,7 +168,7 @@ export async function sendPasswordResetEmail(to: string, name: string, resetToke
     });
     return { success: true };
   } catch (error) {
-    console.error("Failed to send password reset email:", error);
+    console.error('Failed to send password reset email:', error);
     return { success: false, error };
   }
 }
@@ -176,11 +183,12 @@ export async function sendSessionCompletionEmail(
   company: string,
   sessionId: string
 ) {
-  const scoreColor = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
-  const scoreEmoji = score >= 80 ? "🏆" : score >= 60 ? "💪" : "📈";
+  const scoreColor =
+    score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
+  const scoreEmoji = score >= 80 ? '🏆' : score >= 60 ? '💪' : '📈';
 
   try {
-    if (!resend) return { success: false, error: "Email not configured" };
+    if (!resend) return { success: false, error: 'Email not configured' };
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
@@ -205,10 +213,10 @@ export async function sendSessionCompletionEmail(
         <span style="color:${scoreColor};font-size:42px;font-weight:800;line-height:120px;">${score}</span>
       </div>
       <h1 style="color:#F5F5F5;font-size:24px;font-weight:700;margin:16px 0 4px;">
-        ${score >= 80 ? "Outstanding performance!" : score >= 60 ? "Good job, keep improving!" : "Keep practicing, you're getting better!"}
+        ${score >= 80 ? 'Outstanding performance!' : score >= 60 ? 'Good job, keep improving!' : "Keep practicing, you're getting better!"}
       </h1>
       <p style="color:#A3A3A3;font-size:14px;margin:0;">
-        ${type.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())} Interview${company !== "general" ? ` • ${company.charAt(0).toUpperCase() + company.slice(1)} Prep` : ""}
+        ${type.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())} Interview${company !== 'general' ? ` • ${company.charAt(0).toUpperCase() + company.slice(1)} Prep` : ''}
       </p>
     </div>
 
@@ -219,12 +227,12 @@ export async function sendSessionCompletionEmail(
     </div>
 
     <div style="text-align:center;margin-top:16px;">
-      <a href="https://twitter.com/intent/tweet?text=I%20just%20scored%20${score}%2F100%20on%20a%20${encodeURIComponent(type)}%20mock%20interview%20on%20PrepWithAI!%20%F0%9F%9A%80&url=${APP_URL}" 
+      <a href="https://twitter.com/intent/tweet?text=I%20just%20scored%20${score}%2F100%20on%20a%20${encodeURIComponent(type)}%20mock%20interview%20on%20PrepWithAI!%20%F0%9F%9A%80&url=${APP_URL}"
          style="color:#7c3aed;font-size:13px;text-decoration:none;">
         Share on Twitter/X
       </a>
       <span style="color:#333;margin:0 8px;">•</span>
-      <a href="https://www.linkedin.com/sharing/share-offsite/?url=${APP_URL}" 
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url=${APP_URL}"
          style="color:#3b82f6;font-size:13px;text-decoration:none;">
         Share on LinkedIn
       </a>
@@ -241,7 +249,7 @@ export async function sendSessionCompletionEmail(
     });
     return { success: true };
   } catch (error) {
-    console.error("Failed to send session completion email:", error);
+    console.error('Failed to send session completion email:', error);
     return { success: false, error };
   }
 }
@@ -253,16 +261,17 @@ export async function sendDailyReminderEmail(
   name: string,
   currentStreak: number
 ) {
-  const firstName = name.split(" ")[0];
+  const firstName = name.split(' ')[0];
 
   try {
-    if (!resend) return { success: false, error: "Email not configured" };
+    if (!resend) return { success: false, error: 'Email not configured' };
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: currentStreak > 0
-        ? `🔥 Your ${currentStreak}-day streak ends tonight — keep it going!`
-        : "👋 Time for today's practice session",
+      subject:
+        currentStreak > 0
+          ? `🔥 Your ${currentStreak}-day streak ends tonight — keep it going!`
+          : "👋 Time for today's practice session",
       html: `
 <!DOCTYPE html>
 <html>
@@ -279,7 +288,9 @@ export async function sendDailyReminderEmail(
     </div>
 
     <div style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.15));border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:32px;text-align:center;">
-      ${currentStreak > 0 ? `
+      ${
+        currentStreak > 0
+          ? `
       <div style="font-size:48px;margin-bottom:8px;">🔥</div>
       <h1 style="color:#F5F5F5;font-size:24px;font-weight:700;margin:0 0 8px;">
         ${currentStreak}-day streak!
@@ -287,7 +298,8 @@ export async function sendDailyReminderEmail(
       <p style="color:#A3A3A3;font-size:15px;margin:0;">
         Don't break it, ${firstName}. One quick session keeps you sharp.
       </p>
-      ` : `
+      `
+          : `
       <div style="font-size:48px;margin-bottom:8px;">💪</div>
       <h1 style="color:#F5F5F5;font-size:24px;font-weight:700;margin:0 0 8px;">
         Ready to practice?
@@ -295,7 +307,8 @@ export async function sendDailyReminderEmail(
       <p style="color:#A3A3A3;font-size:15px;margin:0;">
         Start a streak today, ${firstName}. Consistency beats intensity.
       </p>
-      `}
+      `
+      }
     </div>
 
     <div style="text-align:center;margin:24px 0;">
@@ -315,7 +328,7 @@ export async function sendDailyReminderEmail(
     });
     return { success: true };
   } catch (error) {
-    console.error("Failed to send daily reminder:", error);
+    console.error('Failed to send daily reminder:', error);
     return { success: false, error };
   }
 }
@@ -340,11 +353,11 @@ export async function sendWeeklyReportEmail(
   const sessionsDiff = stats.sessionsThisWeek - stats.sessionsLastWeek;
 
   try {
-    if (!resend) return { success: false, error: "Email not configured" };
+    if (!resend) return { success: false, error: 'Email not configured' };
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: `📊 Your weekly progress report — ${scoreDiff >= 0 ? "+" : ""}${scoreDiff} points`,
+      subject: `📊 Your weekly progress report — ${scoreDiff >= 0 ? '+' : ''}${scoreDiff} points`,
       html: `
 <!DOCTYPE html>
 <html>
@@ -369,12 +382,12 @@ export async function sendWeeklyReportEmail(
       <div style="background:#111;border:1px solid #222;border-radius:12px;padding:16px;text-align:center;">
         <div style="color:#A3A3A3;font-size:12px;margin-bottom:4px;">Sessions</div>
         <div style="color:#F5F5F5;font-size:24px;font-weight:700;">${stats.sessionsThisWeek}</div>
-        <div style="color:${sessionsDiff >= 0 ? "#10b981" : "#ef4444"};font-size:12px;">${sessionsDiff >= 0 ? "+" : ""}${sessionsDiff} vs last week</div>
+        <div style="color:${sessionsDiff >= 0 ? '#10b981' : '#ef4444'};font-size:12px;">${sessionsDiff >= 0 ? '+' : ''}${sessionsDiff} vs last week</div>
       </div>
       <div style="background:#111;border:1px solid #222;border-radius:12px;padding:16px;text-align:center;">
         <div style="color:#A3A3A3;font-size:12px;margin-bottom:4px;">Avg Score</div>
         <div style="color:#F5F5F5;font-size:24px;font-weight:700;">${stats.avgScoreThisWeek}</div>
-        <div style="color:${scoreDiff >= 0 ? "#10b981" : "#ef4444"};font-size:12px;">${scoreDiff >= 0 ? "+" : ""}${scoreDiff} points</div>
+        <div style="color:${scoreDiff >= 0 ? '#10b981' : '#ef4444'};font-size:12px;">${scoreDiff >= 0 ? '+' : ''}${scoreDiff} points</div>
       </div>
       <div style="background:#111;border:1px solid #222;border-radius:12px;padding:16px;text-align:center;">
         <div style="color:#A3A3A3;font-size:12px;margin-bottom:4px;">Streak</div>
@@ -391,8 +404,8 @@ export async function sendWeeklyReportEmail(
     <div style="background:#111;border:1px solid #222;border-radius:12px;padding:20px;margin-bottom:24px;">
       <h3 style="color:#F5F5F5;font-size:15px;font-weight:600;margin:0 0 12px;">📌 This Week's Insights</h3>
       <div style="color:#A3A3A3;font-size:14px;line-height:1.8;">
-        ${stats.topCategory ? `✅ Strongest area: <strong style="color:#10b981">${stats.topCategory}</strong>` : ""}<br>
-        ${stats.weakestCategory ? `⚠️ Needs work: <strong style="color:#f59e0b">${stats.weakestCategory}</strong>` : ""}<br>
+        ${stats.topCategory ? `✅ Strongest area: <strong style="color:#10b981">${stats.topCategory}</strong>` : ''}<br>
+        ${stats.weakestCategory ? `⚠️ Needs work: <strong style="color:#f59e0b">${stats.weakestCategory}</strong>` : ''}<br>
         ${scoreDiff > 0 ? `📈 Your scores are trending up — great momentum!` : scoreDiff < 0 ? `📉 Scores dipped this week — focus on your weak areas.` : `➡️ Scores are steady — try harder problems to push your limits.`}
       </div>
     </div>
@@ -414,7 +427,7 @@ export async function sendWeeklyReportEmail(
     });
     return { success: true };
   } catch (error) {
-    console.error("Failed to send weekly report:", error);
+    console.error('Failed to send weekly report:', error);
     return { success: false, error };
   }
 }

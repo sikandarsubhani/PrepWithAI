@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 const FILLER_WORDS = [
-  "um",
-  "uh",
-  "like",
-  "you know",
-  "basically",
-  "literally",
-  "actually",
-  "so",
-  "right",
-  "I mean",
-  "sort of",
-  "kind of",
+  'um',
+  'uh',
+  'like',
+  'you know',
+  'basically',
+  'literally',
+  'actually',
+  'so',
+  'right',
+  'I mean',
+  'sort of',
+  'kind of',
 ];
 
 const WAVEFORM_BARS = 20;
@@ -49,8 +49,8 @@ interface UseVoiceInterviewReturn {
 export function useVoiceInterview(): UseVoiceInterviewReturn {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [interimTranscript, setInterimTranscript] = useState("");
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [fillerCount, setFillerCount] = useState(0);
   const [fillerWords, setFillerWords] = useState<
     { word: string; count: number }[]
@@ -58,8 +58,8 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
   const [wordsPerMinute, setWordsPerMinute] = useState(0);
   const [totalWords, setTotalWords] = useState(0);
   const [speakingDuration, setSpeakingDuration] = useState(0);
-  const [waveformData, setWaveformData] = useState<number[]>(
-    () => new Array(WAVEFORM_BARS).fill(0),
+  const [waveformData, setWaveformData] = useState<number[]>(() =>
+    new Array(WAVEFORM_BARS).fill(0)
   );
   const [audioLevel, setAudioLevel] = useState(0);
   const [silenceDetected, setSilenceDetected] = useState(false);
@@ -81,7 +81,7 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
   const silenceFiredRef = useRef(false);
 
   const isSupported =
-    typeof window !== "undefined" &&
+    typeof window !== 'undefined' &&
     !!(
       window.SpeechRecognition ||
       (window as unknown as { webkitSpeechRecognition: unknown })
@@ -98,7 +98,7 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     const found: Record<string, number> = {};
 
     for (const word of FILLER_WORDS) {
-      const regex = new RegExp(`\\b${word}\\b`, "gi");
+      const regex = new RegExp(`\\b${word}\\b`, 'gi');
       const matches = lower.match(regex);
       if (matches) {
         count += matches.length;
@@ -107,11 +107,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     }
 
     if (count > 0) {
-      setFillerCount((prev) => prev + count);
-      setFillerWords((prev) => {
+      setFillerCount(prev => prev + count);
+      setFillerWords(prev => {
         const updated = [...prev];
         for (const [word, cnt] of Object.entries(found)) {
-          const existing = updated.find((f) => f.word === word);
+          const existing = updated.find(f => f.word === word);
           if (existing) {
             existing.count += cnt;
           } else {
@@ -205,11 +205,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     sourceRef.current?.disconnect();
     sourceRef.current = null;
     analyserRef.current = null;
-    if (audioCtxRef.current?.state !== "closed") {
+    if (audioCtxRef.current?.state !== 'closed') {
       audioCtxRef.current?.close();
     }
     audioCtxRef.current = null;
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach(t => t.stop());
     streamRef.current = null;
     setWaveformData(new Array(WAVEFORM_BARS).fill(0));
     setAudioLevel(0);
@@ -230,11 +230,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     const recognition = new SR() as SpeechRecognition;
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "en-US";
+    recognition.lang = 'en-US';
 
     recognition.onresult = (e: SpeechRecognitionEvent) => {
-      let finalText = "";
-      let interim = "";
+      let finalText = '';
+      let interim = '';
 
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
@@ -251,11 +251,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
         silenceFiredRef.current = false;
         setSilenceDetected(false);
 
-        setTranscript((prev) => prev + finalText);
+        setTranscript(prev => prev + finalText);
         detectFillers(finalText);
 
         const words = finalText.trim().split(/\s+/).length;
-        setTotalWords((prev) => {
+        setTotalWords(prev => {
           const newTotal = prev + words;
           calculateWPM(newTotal);
           return newTotal;
@@ -267,11 +267,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (e: any) => {
-      if (e.error === "not-allowed") {
-        console.error("Microphone access denied");
+      if (e.error === 'not-allowed') {
+        console.error('Microphone access denied');
       }
-      if (e.error !== "no-speech" && e.error !== "aborted") {
-        console.error("Speech recognition error:", e.error);
+      if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        console.error('Speech recognition error:', e.error);
       }
     };
 
@@ -294,7 +294,7 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     // Track speaking duration
     durationTimerRef.current = setInterval(() => {
       setSpeakingDuration(
-        Math.floor((Date.now() - startTimeRef.current) / 1000),
+        Math.floor((Date.now() - startTimeRef.current) / 1000)
       );
     }, 1000);
 
@@ -305,7 +305,7 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
       recognition.start();
       setIsListening(true);
     } catch (err) {
-      console.error("Failed to start speech recognition:", err);
+      console.error('Failed to start speech recognition:', err);
     }
   }, [isSupported, detectFillers, calculateWPM, startAudioAnalyser]);
 
@@ -321,13 +321,13 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
     }
     stopAudioAnalyser();
     setIsListening(false);
-    setInterimTranscript("");
+    setInterimTranscript('');
   }, [stopAudioAnalyser]);
 
   // ─── TTS ──────────────────────────────────────────
 
   const speakText = useCallback((text: string, onEnd?: () => void) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
 
@@ -338,11 +338,11 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
 
     const voices = window.speechSynthesis.getVoices();
     const voice = voices.find(
-      (v) =>
-        (v.name.includes("Google") && v.lang === "en-US") ||
-        v.name.includes("Alex") ||
-        v.name.includes("Samantha") ||
-        (v.lang === "en-US" && v.localService),
+      v =>
+        (v.name.includes('Google') && v.lang === 'en-US') ||
+        v.name.includes('Alex') ||
+        v.name.includes('Samantha') ||
+        (v.lang === 'en-US' && v.localService)
     );
     if (voice) utterance.voice = voice;
 
@@ -359,15 +359,15 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
   }, []);
 
   const stopSpeaking = useCallback(() => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
     setIsSpeaking(false);
   }, []);
 
   const resetTranscript = useCallback(() => {
-    setTranscript("");
-    setInterimTranscript("");
+    setTranscript('');
+    setInterimTranscript('');
     setFillerCount(0);
     setFillerWords([]);
     setWordsPerMinute(0);
@@ -389,16 +389,16 @@ export function useVoiceInterview(): UseVoiceInterviewReturn {
       if (durationTimerRef.current) {
         clearInterval(durationTimerRef.current);
       }
-      if (typeof window !== "undefined" && window.speechSynthesis) {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
       // Cleanup audio analyser
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       sourceRef.current?.disconnect();
-      if (audioCtxRef.current?.state !== "closed") {
+      if (audioCtxRef.current?.state !== 'closed') {
         audioCtxRef.current?.close();
       }
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current?.getTracks().forEach(t => t.stop());
     };
   }, []);
 
