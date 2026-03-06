@@ -7,12 +7,12 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { success, serverError } from "@/lib/response";
-import Session from "@/models/Session";
-import User from "@/models/User";
-import UserProgress from "@/models/UserProgress";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { success, serverError } from '@/lib/response';
+import Session from '@/models/Session';
+import User from '@/models/User';
+import UserProgress from '@/models/UserProgress';
 
 async function handler(_req: NextRequest, { user }: AuthContext) {
   try {
@@ -22,7 +22,7 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
       Session.find({ userId: user.id, completed: true })
         .sort({ createdAt: -1 })
         .select(
-          "overallScore duration createdAt type company difficulty grades"
+          'overallScore duration createdAt type company difficulty grades'
         )
         .limit(100)
         .lean(),
@@ -37,25 +37,19 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
               totalSessions
           )
         : 0;
-    const totalTime = sessions.reduce(
-      (sum, s) => sum + (s.duration || 0),
-      0
-    );
+    const totalTime = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
 
     // Daily scores for charts
-    const dailyScores = sessions.slice(0, 30).map((s) => ({
-      date:
-        (s.createdAt as Date)?.toISOString() || new Date().toISOString(),
+    const dailyScores = sessions.slice(0, 30).map(s => ({
+      date: (s.createdAt as Date)?.toISOString() || new Date().toISOString(),
       score: s.overallScore || 0,
     }));
 
     // Category breakdown from sessions
-    const categoryBreakdown: Record<
-      string,
-      { total: number; count: number }
-    > = {};
+    const categoryBreakdown: Record<string, { total: number; count: number }> =
+      {};
     for (const s of sessions) {
-      const cat = s.type || "dsa";
+      const cat = s.type || 'dsa';
       if (!categoryBreakdown[cat])
         categoryBreakdown[cat] = { total: 0, count: 0 };
       categoryBreakdown[cat].total += s.overallScore || 0;
@@ -73,7 +67,7 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
       { total: number; count: number }
     > = {};
     for (const s of sessions) {
-      const diff = s.difficulty || "mid";
+      const diff = s.difficulty || 'mid';
       if (!difficultyBreakdown[diff])
         difficultyBreakdown[diff] = { total: 0, count: 0 };
       difficultyBreakdown[diff].total += s.overallScore || 0;
@@ -100,32 +94,26 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
       rawSkills as Record<string, number>
     ).map(([skill, score]) => ({
       skill,
-      score: typeof score === "number" ? score : 0,
+      score: typeof score === 'number' ? score : 0,
     }));
 
     // Build activity heatmap from sessions
     const heatmapArr: { date: string; count: number }[] = [];
     const heatmapMap = new Map<string, number>();
     for (const s of sessions) {
-      const dateKey = new Date(s.createdAt as Date)
-        .toISOString()
-        .split("T")[0];
+      const dateKey = new Date(s.createdAt as Date).toISOString().split('T')[0];
       heatmapMap.set(dateKey, (heatmapMap.get(dateKey) || 0) + 1);
     }
-    heatmapMap.forEach((count, date) =>
-      heatmapArr.push({ date, count })
-    );
+    heatmapMap.forEach((count, date) => heatmapArr.push({ date, count }));
 
     // Best score
     const bestScore =
       sessions.length > 0
-        ? Math.max(...sessions.map((s) => s.overallScore || 0))
+        ? Math.max(...sessions.map(s => s.overallScore || 0))
         : 0;
 
     // Recent scores
-    const recentScores = sessions
-      .slice(0, 10)
-      .map((s) => s.overallScore || 0);
+    const recentScores = sessions.slice(0, 10).map(s => s.overallScore || 0);
 
     return success({
       // Core stats (used by dashboard page)
@@ -147,8 +135,7 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
       skillBreakdown,
 
       // Categories
-      categoryScores:
-        progress?.categoryScores || computedCategoryScores,
+      categoryScores: progress?.categoryScores || computedCategoryScores,
 
       // Charts (both formats)
       dailyScores,
@@ -172,7 +159,7 @@ async function handler(_req: NextRequest, { user }: AuthContext) {
       performanceByDifficulty,
     });
   } catch (error) {
-    return serverError("Failed to get progress", error);
+    return serverError('Failed to get progress', error);
   }
 }
 

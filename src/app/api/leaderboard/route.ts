@@ -4,11 +4,11 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { success, badRequest, serverError } from "@/lib/response";
-import { validateQuery, leaderboardQuerySchema } from "@/lib/validation";
-import User from "@/models/User";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { success, badRequest, serverError } from '@/lib/response';
+import { validateQuery, leaderboardQuerySchema } from '@/lib/validation';
+import User from '@/models/User';
 
 // ─── In-Memory Cache ────────────────────────────────
 
@@ -67,14 +67,14 @@ function toEntry(user: unknown, index: number): LeaderboardEntry {
   return {
     rank: index + 1,
     id: u._id.toString(),
-    name: u.name || "Anonymous",
+    name: u.name || 'Anonymous',
     image: u.image || null,
     eloRating: u.eloRating || 1200,
     streak: u.currentStreak || 0,
     totalSessions: u.totalSessions || 0,
     avgScore: u.avgScore || 0,
     badges: u.badges || [],
-    plan: u.plan || "free",
+    plan: u.plan || 'free',
     isCurrentUser: false,
   };
 }
@@ -84,7 +84,8 @@ function toEntry(user: unknown, index: number): LeaderboardEntry {
 async function handler(req: NextRequest, ctx: AuthContext) {
   try {
     const validated = validateQuery(req.url, leaderboardQuerySchema);
-    if (validated.error || !validated.data) return badRequest(validated.error || "Invalid query");
+    if (validated.error || !validated.data)
+      return badRequest(validated.error || 'Invalid query');
 
     const { period, limit } = validated.data;
     const userId = ctx.user.id;
@@ -105,11 +106,11 @@ async function handler(req: NextRequest, ctx: AuthContext) {
     } else {
       // Build date filter
       const query: Record<string, unknown> = {};
-      if (period === "weekly") {
+      if (period === 'weekly') {
         query.lastActiveDate = {
           $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         };
-      } else if (period === "monthly") {
+      } else if (period === 'monthly') {
         query.lastActiveDate = {
           $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
         };
@@ -118,7 +119,7 @@ async function handler(req: NextRequest, ctx: AuthContext) {
       const users = await User.find(query)
         .sort({ eloRating: -1 })
         .select(
-          "name image eloRating currentStreak totalSessions avgScore badges plan"
+          'name image eloRating currentStreak totalSessions avgScore badges plan'
         )
         .limit(limit)
         .lean();
@@ -131,19 +132,19 @@ async function handler(req: NextRequest, ctx: AuthContext) {
     }
 
     // Mark current user
-    const result = leaderboard.map((entry) => ({
+    const result = leaderboard.map(entry => ({
       ...entry,
       isCurrentUser: entry.id === userId,
     }));
 
     // Find current user's rank if not in top results
-    const currentUserInList = result.find((u) => u.isCurrentUser);
+    const currentUserInList = result.find(u => u.isCurrentUser);
     let currentUserRank: LeaderboardEntry | null = null;
 
     if (!currentUserInList) {
       const currentUser = await User.findById(userId)
         .select(
-          "name image eloRating currentStreak totalSessions avgScore badges plan"
+          'name image eloRating currentStreak totalSessions avgScore badges plan'
         )
         .lean();
 
@@ -165,7 +166,7 @@ async function handler(req: NextRequest, ctx: AuthContext) {
       cached: !!cached,
     });
   } catch (error) {
-    return serverError("Failed to fetch leaderboard", error);
+    return serverError('Failed to fetch leaderboard', error);
   }
 }
 

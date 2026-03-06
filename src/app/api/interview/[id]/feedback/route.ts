@@ -6,14 +6,14 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { notFound, forbidden, serverError } from "@/lib/response";
-import { generateFeedback } from "@/lib/groq";
-import { calculateNewElo } from "@/lib/utils";
-import Session from "@/models/Session";
-import User from "@/models/User";
-import UserProgress from "@/models/UserProgress";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { notFound, forbidden, serverError } from '@/lib/response';
+import { generateFeedback } from '@/lib/groq';
+import { calculateNewElo } from '@/lib/utils';
+import Session from '@/models/Session';
+import User from '@/models/User';
+import UserProgress from '@/models/UserProgress';
 
 async function handler(_req: NextRequest, { user, params }: AuthContext) {
   try {
@@ -21,19 +21,19 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
 
     const interviewSession = await Session.findById(id);
     if (!interviewSession) {
-      return notFound("Session not found");
+      return notFound('Session not found');
     }
     if (interviewSession.userId.toString() !== user.id) {
-      return forbidden("You do not have access to this session");
+      return forbidden('You do not have access to this session');
     }
 
     // Build transcript from messages
     const transcript = interviewSession.messages
       .map(
         (m: { role: string; content: string }) =>
-          `${m.role === "interviewer" ? "Interviewer" : "Candidate"}: ${m.content}`
+          `${m.role === 'interviewer' ? 'Interviewer' : 'Candidate'}: ${m.content}`
       )
-      .join("\n");
+      .join('\n');
 
     // Generate AI feedback
     const feedback = await generateFeedback(
@@ -48,9 +48,7 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
     const duration =
       interviewSession.messages.length > 0
         ? Math.floor(
-            (Date.now() -
-              new Date(interviewSession.createdAt).getTime()) /
-              1000
+            (Date.now() - new Date(interviewSession.createdAt).getTime()) / 1000
           )
         : 0;
 
@@ -102,17 +100,15 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
         userId: user.id,
         completed: true,
       })
-        .select("overallScore")
+        .select('overallScore')
         .lean();
 
       const totalSessions = allSessions.length;
       const avgScore =
         totalSessions > 0
           ? Math.round(
-              allSessions.reduce(
-                (sum, s) => sum + (s.overallScore || 0),
-                0
-              ) / totalSessions
+              allSessions.reduce((sum, s) => sum + (s.overallScore || 0), 0) /
+                totalSessions
             )
           : 0;
 
@@ -127,22 +123,22 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
     // ─── Update UserProgress ────────────────────────
 
     const categoryMap: Record<string, string> = {
-      dsa: "dsa",
-      system_design: "systemDesign",
-      behavioral: "behavioral",
-      frontend: "frontend",
-      backend: "backend",
-      full_stack: "backend",
-      full_loop: "dsa",
-      machine_learning: "backend",
-      mobile: "frontend",
-      devops: "backend",
-      data_engineering: "backend",
-      security: "backend",
+      dsa: 'dsa',
+      system_design: 'systemDesign',
+      behavioral: 'behavioral',
+      frontend: 'frontend',
+      backend: 'backend',
+      full_stack: 'backend',
+      full_loop: 'dsa',
+      machine_learning: 'backend',
+      mobile: 'frontend',
+      devops: 'backend',
+      data_engineering: 'backend',
+      security: 'backend',
     };
-    const category = categoryMap[interviewSession.type] || "dsa";
+    const category = categoryMap[interviewSession.type] || 'dsa';
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
 
     await UserProgress.findOneAndUpdate(
       { userId: user.id },
@@ -150,14 +146,11 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
         $set: {
           eloRating: newElo,
           [`categoryScores.${category}`]: feedback.overallScore,
-          "skillScores.problemSolving":
-            feedback.grades.problemSolving,
-          "skillScores.communication":
-            feedback.grades.communication,
-          "skillScores.codeQuality": feedback.grades.codeQuality,
-          "skillScores.edgeCases": feedback.grades.edgeCases,
-          "skillScores.timeManagement":
-            feedback.grades.timeManagement,
+          'skillScores.problemSolving': feedback.grades.problemSolving,
+          'skillScores.communication': feedback.grades.communication,
+          'skillScores.codeQuality': feedback.grades.codeQuality,
+          'skillScores.edgeCases': feedback.grades.edgeCases,
+          'skillScores.timeManagement': feedback.grades.timeManagement,
           weakTopics: feedback.recommendedTopics,
         },
         $push: {
@@ -184,10 +177,10 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
     // ─── Send completion email (non-blocking) ───────
 
     try {
-      const { sendSessionCompletionEmail } = await import("@/lib/email");
+      const { sendSessionCompletionEmail } = await import('@/lib/email');
       sendSessionCompletionEmail(
-        dbUser?.email || "",
-        dbUser?.name || "",
+        dbUser?.email || '',
+        dbUser?.name || '',
         feedback.overallScore,
         interviewSession.type,
         interviewSession.company,
@@ -206,7 +199,7 @@ async function handler(_req: NextRequest, { user, params }: AuthContext) {
       },
     });
   } catch (error) {
-    return serverError("Failed to generate feedback", error);
+    return serverError('Failed to generate feedback', error);
   }
 }
 

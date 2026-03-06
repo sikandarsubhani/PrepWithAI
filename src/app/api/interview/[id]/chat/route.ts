@@ -6,33 +6,36 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { chatMessageSchema, validateBody } from "@/lib/validation";
-import { badRequest, notFound, forbidden, serverError } from "@/lib/response";
-import { tooManyRequests } from "@/lib/response";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { chatMessageSchema, validateBody } from '@/lib/validation';
+import { badRequest, notFound, forbidden, serverError } from '@/lib/response';
+import { tooManyRequests } from '@/lib/response';
 import {
   generateInterviewResponse,
   generateInterviewResponseStream,
   checkApiLimit,
-} from "@/lib/groq";
-import { getSystemPrompt, getEndInterviewPrompt } from "@/lib/prompts";
-import { rateLimitChat } from "@/lib/rateLimit";
-import Session from "@/models/Session";
+} from '@/lib/groq';
+import { getSystemPrompt, getEndInterviewPrompt } from '@/lib/prompts';
+import { rateLimitChat } from '@/lib/rateLimit';
+import Session from '@/models/Session';
 
 // Helper: build conversation history from session
-function buildConversationHistory(
-  session: { type: string; company: string; difficulty: string; messages: { role: string; content: string }[] }
-) {
+function buildConversationHistory(session: {
+  type: string;
+  company: string;
+  difficulty: string;
+  messages: { role: string; content: string }[];
+}) {
   const systemPrompt = getSystemPrompt(
     session.type,
     session.company,
     session.difficulty
   );
   const history: {
-    role: "system" | "user" | "assistant";
+    role: 'system' | 'user' | 'assistant';
     content: string;
-  }[] = [{ role: "system", content: systemPrompt }];
+  }[] = [{ role: 'system', content: systemPrompt }];
 
   // Limit to last 30 messages to save tokens, but keep system prompt
   const msgs = session.messages;
@@ -40,7 +43,7 @@ function buildConversationHistory(
 
   for (const msg of recent) {
     history.push({
-      role: msg.role === "interviewer" ? "assistant" : "user",
+      role: msg.role === 'interviewer' ? 'assistant' : 'user',
       content: msg.content,
     });
   }
@@ -51,7 +54,10 @@ function buildConversationHistory(
 // Helper: create streaming response with DB save after completion
 function createStreamingResponse(
   session: ReturnType<typeof Object>,
-  conversationHistory: { role: "system" | "user" | "assistant"; content: string }[],
+  conversationHistory: {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+  }[],
   userId: string,
   endpoint: string,
   extraMeta?: { newQuestion?: boolean; hintsUsed?: number }
@@ -63,10 +69,10 @@ function createStreamingResponse(
 
   // Save complete message to DB after stream finishes
   fullContent
-    .then(async (aiMessage) => {
+    .then(async aiMessage => {
       session.messages.push({
         id: `msg-${Date.now()}-ai`,
-        role: "interviewer",
+        role: 'interviewer',
         content: aiMessage,
         timestamp: new Date(),
         isVoice: false,
@@ -74,7 +80,7 @@ function createStreamingResponse(
       await session.save();
     })
     .catch((err: unknown) => {
-      console.error("Failed to save streamed message:", err);
+      console.error('Failed to save streamed message:', err);
     });
 
   // Send metadata in the first SSE event
@@ -85,9 +91,7 @@ function createStreamingResponse(
         meta: true,
         ...(extraMeta || {}),
       };
-      controller.enqueue(
-        encoder.encode(`data: ${JSON.stringify(meta)}\n\n`)
-      );
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify(meta)}\n\n`));
       controller.close();
     },
   });
@@ -116,10 +120,10 @@ function createStreamingResponse(
 
   return new Response(combined, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "X-Accel-Buffering": "no",
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
     },
   });
 }
@@ -129,13 +133,16 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
     // Rate limit per user
     const rateCheck = rateLimitChat(user.id);
     if (!rateCheck.allowed) {
-      return tooManyRequests("Slow down! Please wait before sending another message.", 5);
+      return tooManyRequests(
+        'Slow down! Please wait before sending another message.',
+        5
+      );
     }
 
     // Validate input
     const { data, error } = await validateBody(req, chatMessageSchema);
     if (error || !data) {
-      return badRequest(error || "Invalid input");
+      return badRequest(error || 'Invalid input');
     }
 
     const { id } = params;
@@ -145,20 +152,20 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
     const apiLimit = await checkApiLimit(user.id);
     if (!apiLimit.allowed) {
       return tooManyRequests(
-        "AI responses are temporarily limited due to high usage. Please try again shortly."
+        'AI responses are temporarily limited due to high usage. Please try again shortly.'
       );
     }
 
     // Fetch session
     const session = await Session.findById(id);
     if (!session) {
-      return notFound("Session not found");
+      return notFound('Session not found');
     }
     if (session.userId.toString() !== user.id) {
-      return forbidden("You do not have access to this session");
+      return forbidden('You do not have access to this session');
     }
-    if (session.completed && action !== "end") {
-      return badRequest("This interview session has already ended");
+    if (session.completed && action !== 'end') {
+      return badRequest('This interview session has already ended');
     }
 
     // Build conversation history (with 30-message window)
@@ -167,51 +174,51 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
     // ─── Handle Actions ─────────────────────────────
 
     switch (action) {
-      case "start": {
+      case 'start': {
         conversationHistory.push({
-          role: "user",
+          role: 'user',
           content:
-            "Please start the interview. Introduce yourself briefly and ask the first question.",
+            'Please start the interview. Introduce yourself briefly and ask the first question.',
         });
 
         return createStreamingResponse(
           session,
           conversationHistory,
           user.id,
-          "chat-start",
+          'chat-start',
           { newQuestion: true }
         );
       }
 
-      case "message": {
+      case 'message': {
         if (!content?.trim()) {
-          return badRequest("Message content cannot be empty");
+          return badRequest('Message content cannot be empty');
         }
 
         // Add user message to DB immediately
         session.messages.push({
           id: `msg-${Date.now()}-user`,
-          role: "candidate",
+          role: 'candidate',
           content: content.trim(),
           timestamp: new Date(),
           isVoice: false,
         });
         await session.save();
 
-        conversationHistory.push({ role: "user", content: content.trim() });
+        conversationHistory.push({ role: 'user', content: content.trim() });
 
         return createStreamingResponse(
           session,
           conversationHistory,
           user.id,
-          "chat-message",
+          'chat-message',
           { newQuestion: false }
         );
       }
 
-      case "hint": {
+      case 'hint': {
         conversationHistory.push({
-          role: "user",
+          role: 'user',
           content:
             "I'm stuck. Can you give me a small hint without revealing the full solution?",
         });
@@ -223,14 +230,14 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
           session,
           conversationHistory,
           user.id,
-          "chat-hint",
+          'chat-hint',
           { hintsUsed: session.hintsUsed }
         );
       }
 
-      case "skip": {
+      case 'skip': {
         conversationHistory.push({
-          role: "user",
+          role: 'user',
           content:
             "I'd like to skip this question. Please briefly explain the optimal approach, then move to the next question.",
         });
@@ -239,15 +246,15 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
           session,
           conversationHistory,
           user.id,
-          "chat-skip",
+          'chat-skip',
           { newQuestion: true }
         );
       }
 
-      case "end": {
+      case 'end': {
         // End remains non-streaming — needs full JSON parsing
         conversationHistory.push({
-          role: "user",
+          role: 'user',
           content: getEndInterviewPrompt(),
         });
 
@@ -257,7 +264,7 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
             temperature: 0.4,
             maxTokens: 1000,
             userId: user.id,
-            endpoint: "chat-end",
+            endpoint: 'chat-end',
           }
         );
 
@@ -272,8 +279,8 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
         };
         let strengths: string[] = [];
         let weaknesses: string[] = [];
-        let summary = "";
-        let seniorTip = "";
+        let summary = '';
+        let seniorTip = '';
 
         try {
           const jsonMatch = endMessage.match(/\{[\s\S]*\}/);
@@ -283,8 +290,8 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
             if (parsed.grades) grades = { ...grades, ...parsed.grades };
             strengths = parsed.strengths || [];
             weaknesses = parsed.weaknesses || [];
-            summary = parsed.summary || "";
-            seniorTip = parsed.tip || "";
+            summary = parsed.summary || '';
+            seniorTip = parsed.tip || '';
           }
         } catch {
           // JSON parsing failed — use defaults
@@ -294,10 +301,8 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
         const duration =
           session.messages.length > 0
             ? Math.floor(
-              (Date.now() -
-                new Date(session.createdAt).getTime()) /
-              1000
-            )
+                (Date.now() - new Date(session.createdAt).getTime()) / 1000
+              )
             : 0;
 
         // Update session
@@ -311,7 +316,7 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
         session.seniorTip = seniorTip;
         session.messages.push({
           id: `msg-${Date.now()}-end`,
-          role: "interviewer",
+          role: 'interviewer',
           content: endMessage,
           timestamp: new Date(),
           isVoice: false,
@@ -335,7 +340,7 @@ async function handler(req: NextRequest, { user, params }: AuthContext) {
         return badRequest(`Invalid action: ${action}`);
     }
   } catch (error) {
-    return serverError("Failed to process message", error);
+    return serverError('Failed to process message', error);
   }
 }
 

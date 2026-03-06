@@ -4,9 +4,9 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import Session from "@/models/Session";
+import { NextRequest, NextResponse } from 'next/server';
+import dbConnect from '@/lib/mongodb';
+import Session from '@/models/Session';
 
 // ─── GET Shared Session ─────────────────────────────
 
@@ -20,7 +20,7 @@ export async function GET(
 
     if (!token || token.length < 8) {
       return NextResponse.json(
-        { error: "Invalid share token" },
+        { error: 'Invalid share token' },
         { status: 400 }
       );
     }
@@ -30,13 +30,13 @@ export async function GET(
       isPublic: true,
     })
       .select(
-        "type company difficulty messages score feedback createdAt completedAt voiceMode"
+        'type company difficulty messages score feedback createdAt completedAt voiceMode'
       )
       .lean();
 
     if (!session) {
       return NextResponse.json(
-        { error: "Session not found or sharing disabled" },
+        { error: 'Session not found or sharing disabled' },
         { status: 404 }
       );
     }
@@ -48,9 +48,9 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("[Share] Error:", error);
+    console.error('[Share] Error:', error);
     return NextResponse.json(
-      { error: "Failed to load shared session" },
+      { error: 'Failed to load shared session' },
       { status: 500 }
     );
   }

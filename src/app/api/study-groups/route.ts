@@ -7,7 +7,8 @@ const MOCK_GROUPS = [
   {
     id: '1',
     name: 'FAANG Interview Prep',
-    description: 'Daily DSA practice and mock interviews targeting FAANG companies.',
+    description:
+      'Daily DSA practice and mock interviews targeting FAANG companies.',
     members: 24,
     maxMembers: 30,
     category: 'Interview Prep',

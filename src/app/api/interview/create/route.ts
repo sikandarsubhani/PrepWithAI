@@ -6,26 +6,26 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { createInterviewSchema, validateBody } from "@/lib/validation";
-import { created, badRequest, serverError } from "@/lib/response";
-import Session from "@/models/Session";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { createInterviewSchema, validateBody } from '@/lib/validation';
+import { created, badRequest, serverError } from '@/lib/response';
+import Session from '@/models/Session';
 
 async function handler(req: NextRequest, { user }: AuthContext) {
   try {
     const { data, error } = await validateBody(req, createInterviewSchema);
     if (error || !data) {
-      return badRequest(error || "Invalid input");
+      return badRequest(error || 'Invalid input');
     }
 
-    const sessionType = data.type.replace(/-/g, "_");
+    const sessionType = data.type.replace(/-/g, '_');
 
     const newSession = await Session.create({
       userId: user.id,
       type: sessionType,
-      company: (data.company || "general").toLowerCase(),
-      difficulty: data.difficulty || "mid",
+      company: (data.company || 'general').toLowerCase(),
+      difficulty: data.difficulty || 'mid',
       voiceMode: data.voiceMode || false,
       videoMode: data.videoMode || false,
       messages: [],
@@ -42,7 +42,7 @@ async function handler(req: NextRequest, { user }: AuthContext) {
       videoMode: newSession.videoMode,
     });
   } catch (error) {
-    return serverError("Failed to create interview session", error);
+    return serverError('Failed to create interview session', error);
   }
 }
 

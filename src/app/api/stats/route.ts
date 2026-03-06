@@ -5,10 +5,10 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import User from "@/models/User";
-import Session from "@/models/Session";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
+import Session from '@/models/Session';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -21,15 +21,17 @@ export async function GET() {
       Session.countDocuments({ completed: true }),
       Session.aggregate([
         { $match: { completed: true, overallScore: { $gt: 0 } } },
-        { $group: { _id: null, avgScore: { $avg: "$overallScore" } } },
+        { $group: { _id: null, avgScore: { $avg: '$overallScore' } } },
       ]),
     ]);
 
     const avgScore = Math.round(avgResult[0]?.avgScore || 0);
 
     // Honest thresholds — never lie, just round to nearest milestone
-    const displayUsers = userCount < 10 ? "10+" : `${Math.floor(userCount / 10) * 10}+`;
-    const displaySessions = sessionCount < 100 ? "100+" : `${Math.floor(sessionCount / 100) * 100}+`;
+    const displayUsers =
+      userCount < 10 ? '10+' : `${Math.floor(userCount / 10) * 10}+`;
+    const displaySessions =
+      sessionCount < 100 ? '100+' : `${Math.floor(sessionCount / 100) * 100}+`;
     const displayAvgScore = avgScore > 0 ? `${avgScore}%` : null;
 
     return NextResponse.json({
@@ -41,9 +43,16 @@ export async function GET() {
       displayAvgScore,
     });
   } catch (error) {
-    console.error("Stats API error:", error);
+    console.error('Stats API error:', error);
     return NextResponse.json(
-      { users: 0, sessions: 0, avgScore: 0, displayUsers: "10+", displaySessions: "100+", displayAvgScore: null },
+      {
+        users: 0,
+        sessions: 0,
+        avgScore: 0,
+        displayUsers: '10+',
+        displaySessions: '100+',
+        displayAvgScore: null,
+      },
       { status: 200 }
     );
   }

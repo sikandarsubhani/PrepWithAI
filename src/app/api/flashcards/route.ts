@@ -4,11 +4,11 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth } from "@/lib/withAuth";
-import { success, badRequest, serverError } from "@/lib/response";
-import { validateQuery, flashcardsQuerySchema } from "@/lib/validation";
-import Question from "@/models/Question";
+import { NextRequest } from 'next/server';
+import { withAuth } from '@/lib/withAuth';
+import { success, badRequest, serverError } from '@/lib/response';
+import { validateQuery, flashcardsQuerySchema } from '@/lib/validation';
+import Question from '@/models/Question';
 
 // ─── Types ──────────────────────────────────────────
 
@@ -27,17 +27,18 @@ interface QuestionDoc {
 async function handler(req: NextRequest) {
   try {
     const validated = validateQuery(req.url, flashcardsQuerySchema);
-    if (validated.error || !validated.data) return badRequest(validated.error || "Invalid query");
+    if (validated.error || !validated.data)
+      return badRequest(validated.error || 'Invalid query');
 
     const { category, limit } = validated.data;
 
     const filter: Record<string, unknown> = {};
-    if (category && category !== "All" && category !== "all") {
-      filter.category = category.toLowerCase().replace(/\s+/g, "-");
+    if (category && category !== 'All' && category !== 'all') {
+      filter.category = category.toLowerCase().replace(/\s+/g, '-');
     }
 
     const questions = await Question.find(filter)
-      .select("title description difficulty category hints solution")
+      .select('title description difficulty category hints solution')
       .limit(limit)
       .lean();
 
@@ -47,15 +48,15 @@ async function handler(req: NextRequest) {
       const back =
         question.solution ||
         (Array.isArray(question.hints) && question.hints.length > 0
-          ? question.hints.join(". ") + "."
-          : "Review the solution approach for this problem.");
+          ? question.hints.join('. ') + '.'
+          : 'Review the solution approach for this problem.');
 
       return {
         id: question._id.toString(),
         front,
         back,
-        category: question.category || "general",
-        difficulty: question.difficulty || "medium",
+        category: question.category || 'general',
+        difficulty: question.difficulty || 'medium',
         mastered: false,
       };
     });
@@ -65,7 +66,7 @@ async function handler(req: NextRequest) {
       total: flashcards.length,
     });
   } catch (error) {
-    return serverError("Failed to fetch flashcards", error);
+    return serverError('Failed to fetch flashcards', error);
   }
 }
 

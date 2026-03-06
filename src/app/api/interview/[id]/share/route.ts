@@ -4,11 +4,11 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest } from "next/server";
-import { withAuth, AuthContext } from "@/lib/withAuth";
-import { success, notFound, badRequest, serverError } from "@/lib/response";
-import Session from "@/models/Session";
-import { Types } from "mongoose";
+import { NextRequest } from 'next/server';
+import { withAuth, AuthContext } from '@/lib/withAuth';
+import { success, notFound, badRequest, serverError } from '@/lib/response';
+import Session from '@/models/Session';
+import { Types } from 'mongoose';
 
 // ─── POST Toggle Share ──────────────────────────────
 
@@ -16,7 +16,7 @@ async function handler(req: NextRequest, ctx: AuthContext) {
   try {
     const { id } = ctx.params;
     if (!id || !Types.ObjectId.isValid(id)) {
-      return badRequest("Invalid session ID");
+      return badRequest('Invalid session ID');
     }
 
     const session = await Session.findOne({
@@ -24,10 +24,11 @@ async function handler(req: NextRequest, ctx: AuthContext) {
       userId: ctx.user.id,
     });
 
-    if (!session) return notFound("Session not found");
+    if (!session) return notFound('Session not found');
 
     const body = await req.json().catch(() => ({}));
-    const enabled = typeof body.enabled === "boolean" ? body.enabled : !session.isPublic;
+    const enabled =
+      typeof body.enabled === 'boolean' ? body.enabled : !session.isPublic;
 
     session.isPublic = enabled;
 
@@ -42,11 +43,11 @@ async function handler(req: NextRequest, ctx: AuthContext) {
       shareEnabled: session.isPublic,
       shareToken: session.isPublic ? session.shareToken : null,
       shareUrl: session.isPublic
-        ? `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/share/${session.shareToken}`
+        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/share/${session.shareToken}`
         : null,
     });
   } catch (error) {
-    return serverError("Failed to update sharing", error);
+    return serverError('Failed to update sharing', error);
   }
 }
 

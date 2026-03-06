@@ -4,16 +4,16 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import { checkApiLimit } from "@/lib/groq";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/mongodb';
+import { checkApiLimit } from '@/lib/groq';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 // ─── Service Health Types ───────────────────────────
 
 interface ServiceHealth {
-  status: "healthy" | "degraded" | "unhealthy" | "unknown" | "rate_limited";
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown' | 'rate_limited';
   latency?: number;
   message?: string;
 }
@@ -22,22 +22,22 @@ interface ServiceHealth {
 
 export async function GET() {
   const services: Record<string, ServiceHealth> = {};
-  let overallStatus: "healthy" | "degraded" | "unhealthy" = "healthy";
+  let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 
   // 1. Check MongoDB
   const dbStart = Date.now();
   try {
     await dbConnect();
     services.database = {
-      status: "healthy",
+      status: 'healthy',
       latency: Date.now() - dbStart,
     };
   } catch (error) {
-    overallStatus = "degraded";
+    overallStatus = 'degraded';
     services.database = {
-      status: "unhealthy",
+      status: 'unhealthy',
       latency: Date.now() - dbStart,
-      message: error instanceof Error ? error.message : "Connection failed",
+      message: error instanceof Error ? error.message : 'Connection failed',
     };
   }
 
@@ -45,48 +45,44 @@ export async function GET() {
   try {
     const usage = await checkApiLimit();
     services.ai = {
-      status: usage.allowed ? "healthy" : "rate_limited",
+      status: usage.allowed ? 'healthy' : 'rate_limited',
       message: usage.allowed
         ? `${usage.remaining}/${usage.limit} calls remaining`
-        : "Daily API limit reached",
+        : 'Daily API limit reached',
     };
-    if (!usage.allowed) overallStatus = "degraded";
+    if (!usage.allowed) overallStatus = 'degraded';
   } catch {
     services.ai = {
-      status: "unknown",
-      message: "Could not check API usage",
+      status: 'unknown',
+      message: 'Could not check API usage',
     };
   }
 
   // 3. Check required environment variables
-  const requiredEnvVars = [
-    "MONGODB_URI",
-    "NEXTAUTH_SECRET",
-    "GROQ_API_KEY",
-  ];
-  const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
+  const requiredEnvVars = ['MONGODB_URI', 'NEXTAUTH_SECRET', 'GROQ_API_KEY'];
+  const missingVars = requiredEnvVars.filter(v => !process.env[v]);
   services.config = {
-    status: missingVars.length === 0 ? "healthy" : "unhealthy",
+    status: missingVars.length === 0 ? 'healthy' : 'unhealthy',
     message:
       missingVars.length === 0
-        ? "All required environment variables present"
-        : `Missing: ${missingVars.join(", ")}`,
+        ? 'All required environment variables present'
+        : `Missing: ${missingVars.join(', ')}`,
   };
-  if (missingVars.length > 0) overallStatus = "unhealthy";
+  if (missingVars.length > 0) overallStatus = 'unhealthy';
 
   // 4. Memory usage
   const mem = process.memoryUsage();
   services.memory = {
-    status: mem.heapUsed / mem.heapTotal < 0.9 ? "healthy" : "degraded",
+    status: mem.heapUsed / mem.heapTotal < 0.9 ? 'healthy' : 'degraded',
     message: `${Math.round(mem.heapUsed / 1024 / 1024)}MB / ${Math.round(mem.heapTotal / 1024 / 1024)}MB`,
   };
 
-  const statusCode = overallStatus === "healthy" ? 200 : 503;
+  const statusCode = overallStatus === 'healthy' ? 200 : 503;
   return NextResponse.json(
     {
       status: overallStatus,
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || "1.0.0",
+      version: process.env.npm_package_version || '1.0.0',
       services,
     },
     { status: statusCode }

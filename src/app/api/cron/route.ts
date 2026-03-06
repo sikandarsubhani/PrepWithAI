@@ -6,19 +6,19 @@
 // Built by Abdullah Tariq, Lahore Pakistan
 // ===========================================
 
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import User from "@/models/User";
-import Session from "@/models/Session";
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
+import Session from '@/models/Session';
 
 // ─── Verify Cron Secret ─────────────────────────────
 
 function verifyCronSecret(req: NextRequest): boolean {
-  const secret = req.headers.get("authorization")?.replace("Bearer ", "");
+  const secret = req.headers.get('authorization')?.replace('Bearer ', '');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
-    console.warn("[Cron] CRON_SECRET not configured");
+    console.warn('[Cron] CRON_SECRET not configured');
     return false;
   }
 
@@ -30,19 +30,22 @@ function verifyCronSecret(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   // Verify authorization
   if (!verifyCronSecret(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
-  const job = searchParams.get("job") || "all";
+  const job = searchParams.get('job') || 'all';
 
   await connectDB();
 
-  const results: Record<string, { success: boolean; message: string; affected?: number }> = {};
+  const results: Record<
+    string,
+    { success: boolean; message: string; affected?: number }
+  > = {};
 
   try {
     // ─── Job 1: Streak Maintenance ────────────────────
-    if (job === "all" || job === "streaks") {
+    if (job === 'all' || job === 'streaks') {
       try {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -54,12 +57,16 @@ export async function POST(req: NextRequest) {
         // Find users who have a streak but didn't complete a session yesterday
         const usersWithStreak = await User.find({
           currentStreak: { $gt: 0 },
-        }).select("_id currentStreak lastActiveDate").lean();
+        })
+          .select('_id currentStreak lastActiveDate')
+          .lean();
 
         let streaksBroken = 0;
 
         for (const user of usersWithStreak) {
-          const lastActive = user.lastActiveDate ? new Date(user.lastActiveDate) : null;
+          const lastActive = user.lastActiveDate
+            ? new Date(user.lastActiveDate)
+            : null;
 
           // If last active was before yesterday, break the streak
           if (!lastActive || lastActive < yesterday) {
@@ -76,26 +83,32 @@ export async function POST(req: NextRequest) {
           affected: streaksBroken,
         };
       } catch (error) {
-        console.error("[Cron] Streak maintenance failed:", error);
-        results.streaks = { success: false, message: "Streak maintenance failed" };
+        console.error('[Cron] Streak maintenance failed:', error);
+        results.streaks = {
+          success: false,
+          message: 'Streak maintenance failed',
+        };
       }
     }
 
     // ─── Job 2: Weekly Progress Emails ────────────────
-    if (job === "all" || job === "weekly-emails") {
+    if (job === 'all' || job === 'weekly-emails') {
       try {
         // Only run on Mondays
         const today = new Date();
         const isMonday = today.getDay() === 1;
 
-        if (!isMonday && job !== "weekly-emails") {
-          results.weeklyEmails = { success: true, message: "Skipped — not Monday" };
+        if (!isMonday && job !== 'weekly-emails') {
+          results.weeklyEmails = {
+            success: true,
+            message: 'Skipped — not Monday',
+          };
         } else {
           const usersWithReports = await User.find({
             weeklyReport: true,
-            email: { $exists: true, $ne: "" },
+            email: { $exists: true, $ne: '' },
           })
-            .select("_id email name currentStreak totalSessions avgScore")
+            .select('_id email name currentStreak totalSessions avgScore')
             .lean();
 
           let emailsSent = 0;
@@ -112,7 +125,7 @@ export async function POST(req: NextRequest) {
                 completed: true,
                 createdAt: { $gte: oneWeekAgo },
               })
-                .select("overallScore type")
+                .select('overallScore type')
                 .lean();
 
               // Get last week's sessions
@@ -121,7 +134,7 @@ export async function POST(req: NextRequest) {
                 completed: true,
                 createdAt: { $gte: twoWeeksAgo, $lt: oneWeekAgo },
               })
-                .select("overallScore type")
+                .select('overallScore type')
                 .lean();
 
               const sessionsThisWeek = thisWeekSessions.length;
@@ -129,28 +142,32 @@ export async function POST(req: NextRequest) {
               const avgScoreThisWeek =
                 sessionsThisWeek > 0
                   ? Math.round(
-                      thisWeekSessions.reduce((s, sess) => s + (sess.overallScore || 0), 0) /
-                        sessionsThisWeek
+                      thisWeekSessions.reduce(
+                        (s, sess) => s + (sess.overallScore || 0),
+                        0
+                      ) / sessionsThisWeek
                     )
                   : 0;
               const avgScoreLastWeek =
                 sessionsLastWeek > 0
                   ? Math.round(
-                      lastWeekSessions.reduce((s, sess) => s + (sess.overallScore || 0), 0) /
-                        sessionsLastWeek
+                      lastWeekSessions.reduce(
+                        (s, sess) => s + (sess.overallScore || 0),
+                        0
+                      ) / sessionsLastWeek
                     )
                   : 0;
 
               // Determine strongest/weakest categories
               const categoryScores: Record<string, number[]> = {};
               for (const s of thisWeekSessions) {
-                const cat = s.type || "dsa";
+                const cat = s.type || 'dsa';
                 if (!categoryScores[cat]) categoryScores[cat] = [];
                 categoryScores[cat].push(s.overallScore || 0);
               }
 
-              let topCategory = "";
-              let weakestCategory = "";
+              let topCategory = '';
+              let weakestCategory = '';
               let topAvg = -1;
               let weakAvg = 101;
 
@@ -158,15 +175,15 @@ export async function POST(req: NextRequest) {
                 const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
                 if (avg > topAvg) {
                   topAvg = avg;
-                  topCategory = cat.replace(/_/g, " ");
+                  topCategory = cat.replace(/_/g, ' ');
                 }
                 if (avg < weakAvg) {
                   weakAvg = avg;
-                  weakestCategory = cat.replace(/_/g, " ");
+                  weakestCategory = cat.replace(/_/g, ' ');
                 }
               }
 
-              const { sendWeeklyReportEmail } = await import("@/lib/email");
+              const { sendWeeklyReportEmail } = await import('@/lib/email');
               await sendWeeklyReportEmail(user.email, user.name, {
                 sessionsThisWeek,
                 sessionsLastWeek,
@@ -190,20 +207,23 @@ export async function POST(req: NextRequest) {
           };
         }
       } catch (error) {
-        console.error("[Cron] Weekly emails failed:", error);
-        results.weeklyEmails = { success: false, message: "Weekly emails failed" };
+        console.error('[Cron] Weekly emails failed:', error);
+        results.weeklyEmails = {
+          success: false,
+          message: 'Weekly emails failed',
+        };
       }
     }
 
     // ─── Job 3: Analytics Aggregation ─────────────────
-    if (job === "all" || job === "analytics") {
+    if (job === 'all' || job === 'analytics') {
       try {
         // Clean up old API usage records (keep 90 days)
         const ninetyDaysAgo = new Date();
         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-        const cutoffDate = ninetyDaysAgo.toISOString().split("T")[0];
+        const cutoffDate = ninetyDaysAgo.toISOString().split('T')[0];
 
-        const { default: ApiUsage } = await import("@/models/ApiUsage");
+        const { default: ApiUsage } = await import('@/models/ApiUsage');
         const deleteResult = await ApiUsage.deleteMany({
           date: { $lt: cutoffDate },
         });
@@ -216,7 +236,9 @@ export async function POST(req: NextRequest) {
         });
 
         // Count total completed sessions
-        const totalCompleted = await Session.countDocuments({ completed: true });
+        const totalCompleted = await Session.countDocuments({
+          completed: true,
+        });
 
         results.analytics = {
           success: true,
@@ -224,20 +246,23 @@ export async function POST(req: NextRequest) {
           affected: deleteResult.deletedCount,
         };
       } catch (error) {
-        console.error("[Cron] Analytics aggregation failed:", error);
-        results.analytics = { success: false, message: "Analytics aggregation failed" };
+        console.error('[Cron] Analytics aggregation failed:', error);
+        results.analytics = {
+          success: false,
+          message: 'Analytics aggregation failed',
+        };
       }
     }
 
     // ─── Job 4: Daily Streak Reminders ────────────────
-    if (job === "daily-reminders") {
+    if (job === 'daily-reminders') {
       try {
         const usersToRemind = await User.find({
           emailNotifications: true,
           currentStreak: { $gt: 0 },
-          email: { $exists: true, $ne: "" },
+          email: { $exists: true, $ne: '' },
         })
-          .select("_id email name currentStreak lastActiveDate")
+          .select('_id email name currentStreak lastActiveDate')
           .lean();
 
         let remindersSent = 0;
@@ -245,12 +270,14 @@ export async function POST(req: NextRequest) {
         today.setHours(0, 0, 0, 0);
 
         for (const user of usersToRemind) {
-          const lastActive = user.lastActiveDate ? new Date(user.lastActiveDate) : null;
+          const lastActive = user.lastActiveDate
+            ? new Date(user.lastActiveDate)
+            : null;
 
           // Only remind if they haven't been active today
           if (!lastActive || lastActive < today) {
             try {
-              const { sendDailyReminderEmail } = await import("@/lib/email");
+              const { sendDailyReminderEmail } = await import('@/lib/email');
               await sendDailyReminderEmail(
                 user.email,
                 user.name,
@@ -269,8 +296,11 @@ export async function POST(req: NextRequest) {
           affected: remindersSent,
         };
       } catch (error) {
-        console.error("[Cron] Daily reminders failed:", error);
-        results.dailyReminders = { success: false, message: "Daily reminders failed" };
+        console.error('[Cron] Daily reminders failed:', error);
+        results.dailyReminders = {
+          success: false,
+          message: 'Daily reminders failed',
+        };
       }
     }
 
@@ -281,9 +311,12 @@ export async function POST(req: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error("[Cron] Job failed:", error);
+    console.error('[Cron] Job failed:', error);
     return NextResponse.json(
-      { error: "Cron job failed", details: error instanceof Error ? error.message : "Unknown error" },
+      {
+        error: 'Cron job failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }
