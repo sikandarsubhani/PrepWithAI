@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface WaveformVisualizerProps {
   isActive: boolean;
@@ -12,7 +12,7 @@ interface WaveformVisualizerProps {
 
 export function WaveformVisualizer({
   isActive,
-  color = "#8b5cf6",
+  color = '#8b5cf6',
   barCount = 24,
   className,
 }: WaveformVisualizerProps) {
@@ -31,7 +31,7 @@ export function WaveformVisualizer({
     function draw() {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const { width, height } = canvas;
@@ -55,9 +55,9 @@ export function WaveformVisualizer({
         const y = (height - barHeight) / 2;
 
         const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
-        gradient.addColorStop(0, c + "cc");
+        gradient.addColorStop(0, c + 'cc');
         gradient.addColorStop(0.5, c);
-        gradient.addColorStop(1, c + "cc");
+        gradient.addColorStop(1, c + 'cc');
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
@@ -77,7 +77,7 @@ export function WaveformVisualizer({
       ref={canvasRef}
       width={200}
       height={48}
-      className={cn("w-full h-12", className)}
+      className={cn('w-full h-12', className)}
     />
   );
 }
